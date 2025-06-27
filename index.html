@@ -430,6 +430,7 @@
 
     const photos = JSON.parse(localStorage.getItem('photos')) || [];
 
+    // Okuma işlemini async yapalım
     let loadedCount = 0;
     for(let file of files) {
       if(!file.type.startsWith('image/')) continue;
@@ -516,64 +517,72 @@
   }
   prevSongBtn.onclick = () => loadSong(currentSongIndex - 1);
   nextSongBtn.onclick = () => loadSong(currentSongIndex + 1);
-  loadSong(currentSongIndex);
+  loadSong(0);
 
-  // Basit aşk testi
-  const quiz = [
+  // Aşk testi (basit örnek)
+  const quizData = [
     {
-      question: "İrem'in en sevdiği renk nedir?",
-      answers: ["Pembe", "Mavi", "Yeşil", "Sarı"],
+      question: "İrem ve Tolga'nın en sevdiği renk hangisi?",
+      answers: ["Pembe", "Mavi", "Kırmızı", "Sarı"],
       correct: 0
     },
     {
-      question: "Tolga'nın favori mevsimi hangisidir?",
-      answers: ["Yaz", "Kış", "İlkbahar", "Sonbahar"],
-      correct: 1
+      question: "İrem ve Tolga ilk tanıştıklarında nerede buluştu?",
+      answers: ["Kafe", "Park", "Okul", "Sinema"],
+      correct: 2
     },
     {
-      question: "İrem ve Tolga kaç yıldır birlikteler?",
-      answers: ["1", "2", "3", "Henüz yeni başladı"],
-      correct: 2
+      question: "İrem'in en sevdiği mevsim hangisi?",
+      answers: ["Yaz", "Kış", "İlkbahar", "Sonbahar"],
+      correct: 1
     }
   ];
   let quizIndex = 0;
+  let quizScore = 0;
   const quizQuestion = document.getElementById('quizQuestion');
   const quizAnswers = document.getElementById('quizAnswers');
   const nextQuizBtn = document.getElementById('nextQuizBtn');
   const quizResult = document.getElementById('quizResult');
 
   function showQuizQuestion() {
-    quizQuestion.textContent = quiz[quizIndex].question;
+    if(quizIndex >= quizData.length) {
+      quizQuestion.style.display = 'none';
+      quizAnswers.style.display = 'none';
+      nextQuizBtn.style.display = 'none';
+      quizResult.style.display = 'block';
+      quizResult.textContent = `Test tamamlandı! Doğru cevap sayısı: ${quizScore} / ${quizData.length}`;
+      return;
+    }
+    quizResult.style.display = 'none';
+    quizQuestion.style.display = 'block';
+    quizAnswers.style.display = 'block';
+    nextQuizBtn.style.display = 'none';
+
+    const current = quizData[quizIndex];
+    quizQuestion.textContent = current.question;
     quizAnswers.innerHTML = '';
-    quiz[quizIndex].answers.forEach((ans,i) => {
+
+    current.answers.forEach((a, i) => {
       const btn = document.createElement('button');
-      btn.textContent = ans;
+      btn.textContent = a;
       btn.onclick = () => {
-        if(i === quiz[quizIndex].correct) {
-          quizResult.textContent = 'Doğru! 💖';
+        if(i === current.correct) {
+          quizScore++;
+          btn.style.backgroundColor = '#4caf50';
         } else {
-          quizResult.textContent = 'Yanlış 😢';
+          btn.style.backgroundColor = '#f44336';
         }
-        quizResult.style.display = 'block';
-        nextQuizBtn.style.display = 'inline-block';
+        // Disable all answer buttons
         Array.from(quizAnswers.children).forEach(b => b.disabled = true);
+        nextQuizBtn.style.display = 'inline-block';
       };
       quizAnswers.appendChild(btn);
     });
-    quizResult.style.display = 'none';
-    nextQuizBtn.style.display = 'none';
   }
   nextQuizBtn.onclick = () => {
     quizIndex++;
-    if(quizIndex >= quiz.length) {
-      quizQuestion.textContent = 'Test tamamlandı, teşekkürler!';
-      quizAnswers.innerHTML = '';
-      nextQuizBtn.style.display = 'none';
-      quizResult.style.display = 'none';
-    } else {
-      showQuizQuestion();
-    }
-  }
+    showQuizQuestion();
+  };
   showQuizQuestion();
 
   // Not defteri
@@ -589,7 +598,7 @@
       li.textContent = note;
       const delBtn = document.createElement('button');
       delBtn.textContent = 'Sil';
-      delBtn.title = 'Notu Sil';
+      delBtn.title = "Notu sil";
       delBtn.onclick = () => {
         if(confirm('Bu notu silmek istediğine emin misin?')) {
           deleteNote(idx);
@@ -602,19 +611,16 @@
   function saveNotes(notes) {
     localStorage.setItem('notes', JSON.stringify(notes));
   }
-  function deleteNote(index) {
+  function deleteNote(idx) {
     const notes = JSON.parse(localStorage.getItem('notes')) || [];
-    notes.splice(index, 1);
+    notes.splice(idx, 1);
     saveNotes(notes);
     loadNotes();
   }
   noteForm.addEventListener('submit', e => {
     e.preventDefault();
     const val = noteInput.value.trim();
-    if(val === '') {
-      alert('Lütfen not girin!');
-      return;
-    }
+    if(!val) return;
     const notes = JSON.parse(localStorage.getItem('notes')) || [];
     notes.push(val);
     saveNotes(notes);
@@ -636,7 +642,7 @@
       li.textContent = gift;
       const delBtn = document.createElement('button');
       delBtn.textContent = 'Sil';
-      delBtn.title = 'Hediyeyi Sil';
+      delBtn.title = "Hediyeyi sil";
       delBtn.onclick = () => {
         if(confirm('Bu hediyeyi silmek istediğine emin misin?')) {
           deleteGift(idx);
@@ -649,19 +655,16 @@
   function saveGifts(gifts) {
     localStorage.setItem('gifts', JSON.stringify(gifts));
   }
-  function deleteGift(index) {
+  function deleteGift(idx) {
     const gifts = JSON.parse(localStorage.getItem('gifts')) || [];
-    gifts.splice(index, 1);
+    gifts.splice(idx, 1);
     saveGifts(gifts);
     loadGifts();
   }
   giftForm.addEventListener('submit', e => {
     e.preventDefault();
     const val = giftInput.value.trim();
-    if(val === '') {
-      alert('Lütfen hediye girin!');
-      return;
-    }
+    if(!val) return;
     const gifts = JSON.parse(localStorage.getItem('gifts')) || [];
     gifts.push(val);
     saveGifts(gifts);
@@ -670,26 +673,48 @@
   });
   loadGifts();
 
-  // Gece / gündüz modu
+  // Gece/Gündüz modu
   const darkModeToggle = document.getElementById('darkModeToggle');
-  function updateDarkModeUI(isDark) {
-    document.body.classList.toggle('dark', isDark);
-    darkModeToggle.textContent = isDark ? '☀️' : '🌙';
+  function updateDarkModeUI() {
+    if(localStorage.getItem('darkMode') === 'true') {
+      document.body.classList.add('dark');
+      darkModeToggle.textContent = '☀️';
+    } else {
+      document.body.classList.remove('dark');
+      darkModeToggle.textContent = '🌙';
+    }
   }
-  // Başlangıçta localStorage'dan oku
-  let isDarkMode = localStorage.getItem('darkMode') === 'true';
-  updateDarkModeUI(isDarkMode);
-
   darkModeToggle.onclick = () => {
-    isDarkMode = !isDarkMode;
-    localStorage.setItem('darkMode', isDarkMode);
-    updateDarkModeUI(isDarkMode);
-  };
+    const isDark = localStorage.getItem('darkMode') === 'true';
+    localStorage.setItem('darkMode', !isDark);
+    updateDarkModeUI();
+  }
+  updateDarkModeUI();
 
-  // Arkaplanda hafif müzik (otomatik çalıyor, gizli)
-  const backgroundMusic = document.getElementById('backgroundMusic');
-  backgroundMusic.volume = 0.12;
+  // Arka planda kalp ve yıldızlar oluştur
+  function createFloatingShapes() {
+    const count = 25;
+    for(let i=0; i<count; i++) {
+      const heart = document.createElement('div');
+      heart.className = 'heart';
+      heart.style.left = `${Math.random()*100}vw`;
+      heart.style.animationDelay = `${Math.random()*4}s`;
+      heart.style.animationDuration = `${3 + Math.random()*3}s`;
+      heart.style.top = `${100 + Math.random()*50}px`;
+      document.body.appendChild(heart);
+
+      const star = document.createElement('div');
+      star.className = 'star';
+      star.style.left = `${Math.random()*100}vw`;
+      star.style.animationDelay = `${Math.random()*4}s`;
+      star.style.animationDuration = `${3 + Math.random()*3}s`;
+      star.style.top = `${100 + Math.random()*50}px`;
+      document.body.appendChild(star);
+    }
+  }
+  createFloatingShapes();
 
 </script>
+
 </body>
 </html>

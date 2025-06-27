@@ -192,14 +192,19 @@
   }
   document.getElementById('greeting').textContent = getGreeting();
 
-  // Beraber geçen gün sayısı hesapla
-  const startDate = new Date("2022-05-01"); // Tanışma tarihini buraya yaz
+  // Beraber geçen gün sayısı hesapla (sadece tarih kısmı)
+  const startDate = new Date(2025, 6, 23); // 1 Mayıs 2022 (Ay 0'dan başlar)
   const today = new Date();
-  const diffTime = today - startDate;
+
+  const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+  const now = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+  const diffTime = now - start;
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
   document.getElementById('days-together').textContent = `Beraber ${diffDays} gündür mutluyuz.`;
 
-  // Favori alıntı (birkaç tane rastgele göster)
+  // Favori alıntı (rastgele seç)
   const quotes = [
     "Aşk, her an yeniden başlar.",
     "Seninle hayat daha güzel.",
@@ -209,7 +214,7 @@
   ];
   document.getElementById('quote').textContent = quotes[Math.floor(Math.random() * quotes.length)];
 
-  // Sürpriz buton
+  // Sürpriz buton işlemi
   const surpriseBtn = document.getElementById('surprise-btn');
   const surpriseMsg = document.getElementById('surprise-message');
   surpriseBtn.addEventListener('click', () => {

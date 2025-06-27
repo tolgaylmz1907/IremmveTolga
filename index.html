@@ -477,4 +477,126 @@
     if(quizIndex < quiz.length) {
       loadQuiz();
     } else {
-      quizQuestion.textContent = `Test
+      quizQuestion.textContent = `Test tamamlandı! Doğru cevaplarınız: ${score} / ${quiz.length}`;
+      quizAnswers.innerHTML = '';
+      nextQuizBtn.style.display = 'none';
+      quizResult.style.display = 'block';
+    }
+  };
+  loadQuiz();
+
+  // Not defteri (localStorage)
+  const noteForm = document.getElementById('noteForm');
+  const noteInput = document.getElementById('noteInput');
+  const notesList = document.getElementById('notesList');
+
+  function loadNotes() {
+    const notes = JSON.parse(localStorage.getItem('notes')) || [];
+    notesList.innerHTML = '';
+    notes.forEach((note, idx) => {
+      const li = document.createElement('li');
+      li.textContent = note;
+      const btn = document.createElement('button');
+      btn.textContent = 'Sil';
+      btn.onclick = () => {
+        notes.splice(idx, 1);
+        localStorage.setItem('notes', JSON.stringify(notes));
+        loadNotes();
+      };
+      li.appendChild(btn);
+      notesList.appendChild(li);
+    });
+  }
+  noteForm.onsubmit = (e) => {
+    e.preventDefault();
+    const val = noteInput.value.trim();
+    if(val){
+      const notes = JSON.parse(localStorage.getItem('notes')) || [];
+      notes.push(val);
+      localStorage.setItem('notes', JSON.stringify(notes));
+      noteInput.value = '';
+      loadNotes();
+    }
+  };
+  loadNotes();
+
+  // Hediye listesi (localStorage)
+  const giftForm = document.getElementById('giftForm');
+  const giftInput = document.getElementById('giftInput');
+  const giftList = document.getElementById('giftList');
+
+  function loadGifts() {
+    const gifts = JSON.parse(localStorage.getItem('gifts')) || [];
+    giftList.innerHTML = '';
+    gifts.forEach((gift, idx) => {
+      const li = document.createElement('li');
+      li.textContent = gift;
+      const btn = document.createElement('button');
+      btn.textContent = 'Sil';
+      btn.onclick = () => {
+        gifts.splice(idx, 1);
+        localStorage.setItem('gifts', JSON.stringify(gifts));
+        loadGifts();
+      };
+      li.appendChild(btn);
+      giftList.appendChild(li);
+    });
+  }
+  giftForm.onsubmit = (e) => {
+    e.preventDefault();
+    const val = giftInput.value.trim();
+    if(val){
+      const gifts = JSON.parse(localStorage.getItem('gifts')) || [];
+      gifts.push(val);
+      localStorage.setItem('gifts', JSON.stringify(gifts));
+      giftInput.value = '';
+      loadGifts();
+    }
+  };
+  loadGifts();
+
+  // Gece/gündüz modu toggle
+  const darkToggle = document.getElementById('darkModeToggle');
+  darkToggle.onclick = () => {
+    document.body.classList.toggle('dark');
+    if(document.body.classList.contains('dark')) {
+      darkToggle.textContent = '☀️';
+      localStorage.setItem('mode', 'dark');
+    } else {
+      darkToggle.textContent = '🌙';
+      localStorage.setItem('mode', 'light');
+    }
+  };
+  // Başlangıç modu
+  if(localStorage.getItem('mode') === 'dark') {
+    document.body.classList.add('dark');
+    darkToggle.textContent = '☀️';
+  }
+
+  // Kalp ve yıldız animasyonları
+  function createHeart() {
+    const heart = document.createElement('div');
+    heart.classList.add('heart');
+    heart.style.left = Math.random() * window.innerWidth + 'px';
+    heart.style.animationDuration = 3 + Math.random() * 2 + 's';
+    heart.style.fontSize = 10 + Math.random() * 10 + 'px';
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 4000);
+  }
+  function createStar() {
+    const star = document.createElement('div');
+    star.classList.add('star');
+    star.style.left = Math.random() * window.innerWidth + 'px';
+    star.style.animationDuration = 3 + Math.random() * 2 + 's';
+    star.style.fontSize = 8 + Math.random() * 8 + 'px';
+    document.body.appendChild(star);
+    setTimeout(() => star.remove(), 4000);
+  }
+  setInterval(() => {
+    if(Math.random() > 0.5) createHeart();
+    else createStar();
+  }, 300);
+</script>
+
+</body>
+</html>

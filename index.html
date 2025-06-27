@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>İrem & Tolga</title>
 <style>
+  /* Aynı CSS kodunuzu korudum */
   @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
   body {
     margin:0; padding:0;
@@ -322,7 +323,7 @@
   document.getElementById('greeting').textContent = getGreeting();
 
   // Beraber geçen gün sayısı
-  const startDate = new Date(2025, 5, 23); // 1 Mayıs 2022
+  const startDate = new Date(2022, 4, 1); // 1 Mayıs 2022 (Aylar 0'dan başlar)
   function calculateDaysTogether() {
     const today = new Date();
     const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
@@ -331,7 +332,7 @@
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
   }
-  document.getElementById('days-together').textContent = Beraber ${calculateDaysTogether()} gündür mutluyuz.;
+  document.getElementById('days-together').textContent = `Beraber ${calculateDaysTogether()} gündür mutluyuz.`;
 
   // Favori alıntılar
   const quotes = [
@@ -348,7 +349,7 @@
     const now = new Date();
     const options = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
     const timeStr = now.toLocaleTimeString('tr-TR', options);
-    document.getElementById('clock').textContent = Şu an saat: ${timeStr};
+    document.getElementById('clock').textContent = `Şu an saat: ${timeStr}`;
   }
   setInterval(updateClock, 1000);
   updateClock();
@@ -386,7 +387,6 @@
     const thisYearDate = new Date(now.getFullYear(), date.getMonth(), date.getDate());
     let diff = Math.floor((thisYearDate - now) / (1000*60*60*24));
     if(diff < 0) {
-      // Geçtiyse sonraki yıla bak
       diff = Math.floor((new Date(now.getFullYear()+1, date.getMonth(), date.getDate()) - now) / (1000*60*60*24));
     }
     return diff;
@@ -396,7 +396,7 @@
     ul.innerHTML = '';
     importantDates.forEach(d => {
       const li = document.createElement('li');
-      li.textContent = ${d.name} için ${daysUntil(d.date)} gün kaldı.;
+      li.textContent = `${d.name} için ${daysUntil(d.date)} gün kaldı.`;
       ul.appendChild(li);
     });
   }
@@ -477,126 +477,4 @@
     if(quizIndex < quiz.length) {
       loadQuiz();
     } else {
-      quizQuestion.textContent = Test tamamlandı! Doğru cevaplarınız: ${score} / ${quiz.length};
-      quizAnswers.innerHTML = '';
-      nextQuizBtn.style.display = 'none';
-      quizResult.style.display = 'block';
-    }
-  };
-  loadQuiz();
-
-  // Not defteri (localStorage)
-  const noteForm = document.getElementById('noteForm');
-  const noteInput = document.getElementById('noteInput');
-  const notesList = document.getElementById('notesList');
-
-  function loadNotes() {
-    const notes = JSON.parse(localStorage.getItem('notes')) || [];
-    notesList.innerHTML = '';
-    notes.forEach((note, idx) => {
-      const li = document.createElement('li');
-      li.textContent = note;
-      const btn = document.createElement('button');
-      btn.textContent = 'Sil';
-      btn.onclick = () => {
-        notes.splice(idx, 1);
-        localStorage.setItem('notes', JSON.stringify(notes));
-        loadNotes();
-      };
-      li.appendChild(btn);
-      notesList.appendChild(li);
-    });
-  }
-  noteForm.onsubmit = (e) => {
-    e.preventDefault();
-    const val = noteInput.value.trim();
-    if(val){
-      const notes = JSON.parse(localStorage.getItem('notes')) || [];
-      notes.push(val);
-      localStorage.setItem('notes', JSON.stringify(notes));
-      noteInput.value = '';
-      loadNotes();
-    }
-  };
-  loadNotes();
-
-  // Hediye listesi (localStorage)
-  const giftForm = document.getElementById('giftForm');
-  const giftInput = document.getElementById('giftInput');
-  const giftList = document.getElementById('giftList');
-
-  function loadGifts() {
-    const gifts = JSON.parse(localStorage.getItem('gifts')) || [];
-    giftList.innerHTML = '';
-    gifts.forEach((gift, idx) => {
-      const li = document.createElement('li');
-      li.textContent = gift;
-      const btn = document.createElement('button');
-      btn.textContent = 'Sil';
-      btn.onclick = () => {
-        gifts.splice(idx, 1);
-        localStorage.setItem('gifts', JSON.stringify(gifts));
-        loadGifts();
-      };
-      li.appendChild(btn);
-      giftList.appendChild(li);
-    });
-  }
-  giftForm.onsubmit = (e) => {
-    e.preventDefault();
-    const val = giftInput.value.trim();
-    if(val){
-      const gifts = JSON.parse(localStorage.getItem('gifts')) || [];
-      gifts.push(val);
-      localStorage.setItem('gifts', JSON.stringify(gifts));
-      giftInput.value = '';
-      loadGifts();
-    }
-  };
-  loadGifts();
-
-  // Gece/gündüz modu toggle
-  const darkToggle = document.getElementById('darkModeToggle');
-  darkToggle.onclick = () => {
-    document.body.classList.toggle('dark');
-    if(document.body.classList.contains('dark')) {
-      darkToggle.textContent = '☀️';
-      localStorage.setItem('mode', 'dark');
-    } else {
-      darkToggle.textContent = '🌙';
-      localStorage.setItem('mode', 'light');
-    }
-  };
-  // Başlangıç modu
-  if(localStorage.getItem('mode') === 'dark') {
-    document.body.classList.add('dark');
-    darkToggle.textContent = '☀️';
-  }
-
-  // Kalp ve yıldız animasyonları
-  function createHeart() {
-    const heart = document.createElement('div');
-    heart.classList.add('heart');
-    heart.style.left = Math.random() * window.innerWidth + 'px';
-    heart.style.animationDuration = 3 + Math.random() * 2 + 's';
-    heart.style.fontSize = 10 + Math.random() * 10 + 'px';
-    document.body.appendChild(heart);
-    setTimeout(() => heart.remove(), 4000);
-  }
-  function createStar() {
-    const star = document.createElement('div');
-    star.classList.add('star');
-    star.style.left = Math.random() * window.innerWidth + 'px';
-    star.style.animationDuration = 3 + Math.random() * 2 + 's';
-    star.style.fontSize = 8 + Math.random() * 8 + 'px';
-    document.body.appendChild(star);
-    setTimeout(() => star.remove(), 4000);
-  }
-  setInterval(() => {
-    if(Math.random() > 0.5) createHeart();
-    else createStar();
-  }, 300);
-</script>
-
-</body>
-</html>
+      quizQuestion.textContent = `Test

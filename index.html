@@ -236,6 +236,15 @@
   <img src="https://raw.githubusercontent.com/tolgaylmz1907/IremmveTolga/main/photo3.jpg" alt="" />
 </div>
 
+<!-- Fotoğraf yükleme formu -->
+<div>
+  <h3>Fotoğraf Ekle</h3>
+  <form id="photoForm">
+    <input type="file" id="photoInput" accept="image/*" required />
+    <button type="submit">Fotoğraf Yükle</button>
+  </form>
+</div>
+
 <!-- Modal büyük foto -->
 <div id="modal">
   <span id="closeModal" style="position:absolute; top:10px; right:20px; font-size:2rem; color:white; cursor:pointer;">×</span>
@@ -477,15 +486,16 @@
     if(quizIndex < quiz.length) {
       loadQuiz();
     } else {
-      quizQuestion.textContent = `Test tamamlandı! Doğru cevaplarınız: ${score} / ${quiz.length}`;
+      quizQuestion.textContent = "Test tamamlandı!";
       quizAnswers.innerHTML = '';
-      nextQuizBtn.style.display = 'none';
       quizResult.style.display = 'block';
+      quizResult.textContent = `Doğru cevap sayısı: ${score} / ${quiz.length}`;
+      nextQuizBtn.style.display = 'none';
     }
   };
   loadQuiz();
 
-  // Not defteri (localStorage)
+  // Not defteri
   const noteForm = document.getElementById('noteForm');
   const noteInput = document.getElementById('noteInput');
   const notesList = document.getElementById('notesList');
@@ -493,34 +503,33 @@
   function loadNotes() {
     const notes = JSON.parse(localStorage.getItem('notes')) || [];
     notesList.innerHTML = '';
-    notes.forEach((note, idx) => {
+    notes.forEach((note, index) => {
       const li = document.createElement('li');
       li.textContent = note;
-      const btn = document.createElement('button');
-      btn.textContent = 'Sil';
-      btn.onclick = () => {
-        notes.splice(idx, 1);
+      const delBtn = document.createElement('button');
+      delBtn.textContent = 'Sil';
+      delBtn.onclick = () => {
+        notes.splice(index,1);
         localStorage.setItem('notes', JSON.stringify(notes));
         loadNotes();
       };
-      li.appendChild(btn);
+      li.appendChild(delBtn);
       notesList.appendChild(li);
     });
   }
-  noteForm.onsubmit = (e) => {
+  noteForm.onsubmit = e => {
     e.preventDefault();
-    const val = noteInput.value.trim();
-    if(val){
-      const notes = JSON.parse(localStorage.getItem('notes')) || [];
-      notes.push(val);
-      localStorage.setItem('notes', JSON.stringify(notes));
-      noteInput.value = '';
-      loadNotes();
-    }
+    const note = noteInput.value.trim();
+    if(!note) return;
+    const notes = JSON.parse(localStorage.getItem('notes')) || [];
+    notes.push(note);
+    localStorage.setItem('notes', JSON.stringify(notes));
+    noteInput.value = '';
+    loadNotes();
   };
   loadNotes();
 
-  // Hediye listesi (localStorage)
+  // Hediye listesi
   const giftForm = document.getElementById('giftForm');
   const giftInput = document.getElementById('giftInput');
   const giftList = document.getElementById('giftList');
@@ -531,71 +540,95 @@
     gifts.forEach((gift, idx) => {
       const li = document.createElement('li');
       li.textContent = gift;
-      const btn = document.createElement('button');
-      btn.textContent = 'Sil';
-      btn.onclick = () => {
-        gifts.splice(idx, 1);
+      const delBtn = document.createElement('button');
+      delBtn.textContent = "Sil";
+      delBtn.onclick = () => {
+        gifts.splice(idx,1);
         localStorage.setItem('gifts', JSON.stringify(gifts));
         loadGifts();
       };
-      li.appendChild(btn);
+      li.appendChild(delBtn);
       giftList.appendChild(li);
     });
   }
-  giftForm.onsubmit = (e) => {
+  giftForm.onsubmit = e => {
     e.preventDefault();
-    const val = giftInput.value.trim();
-    if(val){
-      const gifts = JSON.parse(localStorage.getItem('gifts')) || [];
-      gifts.push(val);
-      localStorage.setItem('gifts', JSON.stringify(gifts));
-      giftInput.value = '';
-      loadGifts();
-    }
+    const gift = giftInput.value.trim();
+    if(!gift) return;
+    const gifts = JSON.parse(localStorage.getItem('gifts')) || [];
+    gifts.push(gift);
+    localStorage.setItem('gifts', JSON.stringify(gifts));
+    giftInput.value = '';
+    loadGifts();
   };
   loadGifts();
 
-  // Gece/gündüz modu toggle
-  const darkToggle = document.getElementById('darkModeToggle');
-  darkToggle.onclick = () => {
-    document.body.classList.toggle('dark');
-    if(document.body.classList.contains('dark')) {
-      darkToggle.textContent = '☀️';
-      localStorage.setItem('mode', 'dark');
+  // Gece/gündüz modu
+  const darkModeToggle = document.getElementById('darkModeToggle');
+  function setDarkMode(dark) {
+    if(dark) {
+      document.body.classList.add('dark');
+      darkModeToggle.textContent = '☀️';
+      localStorage.setItem('darkMode', 'true');
     } else {
-      darkToggle.textContent = '🌙';
-      localStorage.setItem('mode', 'light');
+      document.body.classList.remove('dark');
+      darkModeToggle.textContent = '🌙';
+      localStorage.setItem('darkMode', 'false');
     }
+  }
+  darkModeToggle.onclick = () => {
+    setDarkMode(!document.body.classList.contains('dark'));
   };
-  // Başlangıç modu
-  if(localStorage.getItem('mode') === 'dark') {
-    document.body.classList.add('dark');
-    darkToggle.textContent = '☀️';
+  // Başlangıçta kayıttan al
+  setDarkMode(localStorage.getItem('darkMode') === 'true');
+
+  // Fotoğraf yükleme ve galeriye ekleme
+
+  const photoForm = document.getElementById('photoForm');
+  const photoInput = document.getElementById('photoInput');
+  const gallery = document.getElementById('gallery');
+
+  // LocalStorage'dan fotoğrafları yükle
+  function loadStoredPhotos() {
+    const photos = JSON.parse(localStorage.getItem('photos')) || [];
+    photos.forEach(src => {
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = "Kullanıcı yüklemesi";
+      gallery.appendChild(img);
+    });
   }
 
-  // Kalp ve yıldız animasyonları
-  function createHeart() {
-    const heart = document.createElement('div');
-    heart.classList.add('heart');
-    heart.style.left = Math.random() * window.innerWidth + 'px';
-    heart.style.animationDuration = 3 + Math.random() * 2 + 's';
-    heart.style.fontSize = 10 + Math.random() * 10 + 'px';
-    document.body.appendChild(heart);
-    setTimeout(() => heart.remove(), 4000);
-  }
-  function createStar() {
-    const star = document.createElement('div');
-    star.classList.add('star');
-    star.style.left = Math.random() * window.innerWidth + 'px';
-    star.style.animationDuration = 3 + Math.random() * 2 + 's';
-    star.style.fontSize = 8 + Math.random() * 8 + 'px';
-    document.body.appendChild(star);
-    setTimeout(() => star.remove(), 4000);
-  }
-  setInterval(() => {
-    if(Math.random() > 0.5) createHeart();
-    else createStar();
-  }, 300);
+  photoForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const file = photoInput.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      const base64 = event.target.result;
+
+      // Mevcut fotoğrafları al
+      const photos = JSON.parse(localStorage.getItem('photos')) || [];
+
+      photos.push(base64);
+
+      // Kaydet
+      localStorage.setItem('photos', JSON.stringify(photos));
+
+      // Galeriye ekle
+      const img = document.createElement('img');
+      img.src = base64;
+      img.alt = "Kullanıcı yüklemesi";
+      gallery.appendChild(img);
+
+      photoForm.reset();
+    };
+    reader.readAsDataURL(file);
+  });
+
+  loadStoredPhotos();
+
 </script>
 
 </body>

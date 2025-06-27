@@ -284,7 +284,7 @@
 <div>
   <h3>Favori Şarkılar</h3>
   <audio id="audioPlayer" controls>
-    <source id="audioSource" src="" type="audio/mpeg">
+    <source id="audioSource" src="" type="audio/mpeg" />
     Tarayıcınız ses öğesini desteklemiyor.
   </audio>
   <div>
@@ -355,7 +355,7 @@
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     return diffDays >= 0 ? diffDays : 0;
   }
-  document.getElementById('days-together').textContent = Beraber ${calculateDaysTogether()} gündür mutluyuz.;
+  document.getElementById('days-together').textContent = `Beraber ${calculateDaysTogether()} gündür mutluyuz.`;
 
   // Favori alıntılar
   const quotes = [
@@ -375,7 +375,7 @@
     const now = new Date();
     const options = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
     const timeStr = now.toLocaleTimeString('tr-TR', options);
-    document.getElementById('clock').textContent = Şu an saat: ${timeStr};
+    document.getElementById('clock').textContent = `Şu an saat: ${timeStr}`;
   }
   setInterval(updateClock, 1000);
   updateClock();
@@ -393,7 +393,7 @@
 
       const img = document.createElement('img');
       img.src = photo;
-      img.alt = Fotoğraf ${idx + 1};
+      img.alt = `Fotoğraf ${idx + 1}`;
       img.title = "Büyütmek için tıkla";
       img.style.cursor = 'pointer';
       img.onclick = () => openModal(photo);
@@ -430,9 +430,9 @@
 
     const photos = JSON.parse(localStorage.getItem('photos')) || [];
 
-    // Okuma işlemini async yapalım
     let loadedCount = 0;
-    for(let file of files) {
+    for(let i=0; i<files.length; i++) {
+      const file = files[i];
       if(!file.type.startsWith('image/')) continue;
 
       const reader = new FileReader();
@@ -490,7 +490,7 @@
     ul.innerHTML = '';
     importantDates.forEach(d => {
       const li = document.createElement('li');
-      li.textContent = ${d.name} için ${daysUntil(d.date)} gün kaldı.;
+      li.textContent = `${d.name} için ${daysUntil(d.date)} gün kaldı.`;
       ul.appendChild(li);
     });
   }
@@ -514,207 +514,3 @@
     audioSource.src = songs[currentSongIndex];
     audioPlayer.load();
     audioPlayer.play();
-  }
-  prevSongBtn.onclick = () => loadSong(currentSongIndex - 1);
-  nextSongBtn.onclick = () => loadSong(currentSongIndex + 1);
-  loadSong(0);
-
-  // Aşk testi (basit örnek)
-  const quizData = [
-    {
-      question: "İrem ve Tolga'nın en sevdiği renk hangisi?",
-      answers: ["Pembe", "Mavi", "Kırmızı", "Sarı"],
-      correct: 0
-    },
-    {
-      question: "İrem ve Tolga ilk tanıştıklarında nerede buluştu?",
-      answers: ["Kafe", "Park", "Okul", "Sinema"],
-      correct: 2
-    },
-    {
-      question: "İrem'in en sevdiği mevsim hangisi?",
-      answers: ["Yaz", "Kış", "İlkbahar", "Sonbahar"],
-      correct: 1
-    }
-  ];
-  let quizIndex = 0;
-  let quizScore = 0;
-  const quizQuestion = document.getElementById('quizQuestion');
-  const quizAnswers = document.getElementById('quizAnswers');
-  const nextQuizBtn = document.getElementById('nextQuizBtn');
-  const quizResult = document.getElementById('quizResult');
-
-  function showQuizQuestion() {
-    if(quizIndex >= quizData.length) {
-      quizQuestion.style.display = 'none';
-      quizAnswers.style.display = 'none';
-      nextQuizBtn.style.display = 'none';
-      quizResult.style.display = 'block';
-      quizResult.textContent = Test tamamlandı! Doğru cevap sayısı: ${quizScore} / ${quizData.length};
-      return;
-    }
-    quizResult.style.display = 'none';
-    quizQuestion.style.display = 'block';
-    quizAnswers.style.display = 'block';
-    nextQuizBtn.style.display = 'none';
-
-    const current = quizData[quizIndex];
-    quizQuestion.textContent = current.question;
-    quizAnswers.innerHTML = '';
-
-    current.answers.forEach((a, i) => {
-      const btn = document.createElement('button');
-      btn.textContent = a;
-      btn.onclick = () => {
-        if(i === current.correct) {
-          quizScore++;
-          btn.style.backgroundColor = '#4caf50';
-        } else {
-          btn.style.backgroundColor = '#f44336';
-        }
-        // Disable all answer buttons
-        Array.from(quizAnswers.children).forEach(b => b.disabled = true);
-        nextQuizBtn.style.display = 'inline-block';
-      };
-      quizAnswers.appendChild(btn);
-    });
-  }
-  nextQuizBtn.onclick = () => {
-    quizIndex++;
-    showQuizQuestion();
-  };
-  showQuizQuestion();
-
-  // Not defteri
-  const noteForm = document.getElementById('noteForm');
-  const noteInput = document.getElementById('noteInput');
-  const notesList = document.getElementById('notesList');
-
-  function loadNotes() {
-    const notes = JSON.parse(localStorage.getItem('notes')) || [];
-    notesList.innerHTML = '';
-    notes.forEach((note, idx) => {
-      const li = document.createElement('li');
-      li.textContent = note;
-      const delBtn = document.createElement('button');
-      delBtn.textContent = 'Sil';
-      delBtn.title = "Notu sil";
-      delBtn.onclick = () => {
-        if(confirm('Bu notu silmek istediğine emin misin?')) {
-          deleteNote(idx);
-        }
-      };
-      li.appendChild(delBtn);
-      notesList.appendChild(li);
-    });
-  }
-  function saveNotes(notes) {
-    localStorage.setItem('notes', JSON.stringify(notes));
-  }
-  function deleteNote(idx) {
-    const notes = JSON.parse(localStorage.getItem('notes')) || [];
-    notes.splice(idx, 1);
-    saveNotes(notes);
-    loadNotes();
-  }
-  noteForm.addEventListener('submit', e => {
-    e.preventDefault();
-    const val = noteInput.value.trim();
-    if(!val) return;
-    const notes = JSON.parse(localStorage.getItem('notes')) || [];
-    notes.push(val);
-    saveNotes(notes);
-    loadNotes();
-    noteInput.value = '';
-  });
-  loadNotes();
-
-  // Hediye listesi
-  const giftForm = document.getElementById('giftForm');
-  const giftInput = document.getElementById('giftInput');
-  const giftList = document.getElementById('giftList');
-
-  function loadGifts() {
-    const gifts = JSON.parse(localStorage.getItem('gifts')) || [];
-    giftList.innerHTML = '';
-    gifts.forEach((gift, idx) => {
-      const li = document.createElement('li');
-      li.textContent = gift;
-      const delBtn = document.createElement('button');
-      delBtn.textContent = 'Sil';
-      delBtn.title = "Hediyeyi sil";
-      delBtn.onclick = () => {
-        if(confirm('Bu hediyeyi silmek istediğine emin misin?')) {
-          deleteGift(idx);
-        }
-      };
-      li.appendChild(delBtn);
-      giftList.appendChild(li);
-    });
-  }
-  function saveGifts(gifts) {
-    localStorage.setItem('gifts', JSON.stringify(gifts));
-  }
-  function deleteGift(idx) {
-    const gifts = JSON.parse(localStorage.getItem('gifts')) || [];
-    gifts.splice(idx, 1);
-    saveGifts(gifts);
-    loadGifts();
-  }
-  giftForm.addEventListener('submit', e => {
-    e.preventDefault();
-    const val = giftInput.value.trim();
-    if(!val) return;
-    const gifts = JSON.parse(localStorage.getItem('gifts')) || [];
-    gifts.push(val);
-    saveGifts(gifts);
-    loadGifts();
-    giftInput.value = '';
-  });
-  loadGifts();
-
-  // Gece/Gündüz modu
-  const darkModeToggle = document.getElementById('darkModeToggle');
-  function updateDarkModeUI() {
-    if(localStorage.getItem('darkMode') === 'true') {
-      document.body.classList.add('dark');
-      darkModeToggle.textContent = '☀️';
-    } else {
-      document.body.classList.remove('dark');
-      darkModeToggle.textContent = '🌙';
-    }
-  }
-  darkModeToggle.onclick = () => {
-    const isDark = localStorage.getItem('darkMode') === 'true';
-    localStorage.setItem('darkMode', !isDark);
-    updateDarkModeUI();
-  }
-  updateDarkModeUI();
-
-  // Arka planda kalp ve yıldızlar oluştur
-  function createFloatingShapes() {
-    const count = 25;
-    for(let i=0; i<count; i++) {
-      const heart = document.createElement('div');
-      heart.className = 'heart';
-      heart.style.left = ${Math.random()*100}vw;
-      heart.style.animationDelay = ${Math.random()*4}s;
-      heart.style.animationDuration = ${3 + Math.random()*3}s;
-      heart.style.top = ${100 + Math.random()*50}px;
-      document.body.appendChild(heart);
-
-      const star = document.createElement('div');
-      star.className = 'star';
-      star.style.left = ${Math.random()*100}vw;
-      star.style.animationDelay = ${Math.random()*4}s;
-      star.style.animationDuration = ${3 + Math.random()*3}s;
-      star.style.top = ${100 + Math.random()*50}px;
-      document.body.appendChild(star);
-    }
-  }
-  createFloatingShapes();
-
-</script>
-
-</body>
-</html>

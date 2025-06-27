@@ -81,12 +81,36 @@
         opacity: 0;
       }
     }
-    <audio autoplay loop controls>
-  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg" />
-</audio>
   </style>
 </head>
 <body>
   <h1>💖 İrem & Tolga 💖</h1>
-  <p>Birlikte geçirdiğimiz her an, bu sayfada ölüms
+  <p>Birlikte geçirdiğimiz her an, bu sayfada ölümsüzleşiyor...</p>
+
+  <img src="https://raw.githubusercontent.com/tolgaylmz1907/IremmveTolga/main/irem-tolga.jpg" alt="İrem ve Tolga" />
+
+  <!-- Kalp animasyonu -->
+  <script>
+    function createHeart() {
+      const heart = document.createElement('div');
+      heart.classList.add('heart');
+      heart.style.left = Math.random() * window.innerWidth + 'px';
+      heart.style.animationDuration = 3 + Math.random() * 2 + 's';
+      heart.style.fontSize = 10 + Math.random() * 10 + 'px';
+      document.body.appendChild(heart);
+      setTimeout(() => {
+        heart.remove();
+      }, 4000);
+    }
+    setInterval(createHeart, 300);
+  </script>
+
+  <!-- Müzik çalar -->
+  <audio autoplay loop controls>
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg" />
+    Tarayıcınız bu ses öğesini desteklemiyor.
+  </audio>
+</body>
+</html>
+
 

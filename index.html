@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>İrem & Tolga - Sevgi Sitesi</title>
 <style>
-  /* (Burada senin mevcut CSS'in aynen kalıyor) */
   @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
   body {
     margin:0; padding:0;
@@ -34,6 +33,7 @@
     font-size: 1.2rem;
     margin-bottom: 1rem;
   }
+
   /* Fotoğraf galerisi */
   .gallery {
     display: flex;
@@ -54,6 +54,7 @@
   .gallery img:hover {
     transform: scale(1.1);
   }
+  /* Fotoğraf listesi öğesi */
   .gallery-item {
     position: relative;
     display: inline-block;
@@ -79,6 +80,7 @@
   .gallery-item button:hover {
     background: rgba(255,255,255,1);
   }
+
   /* Modal */
   #modal {
     position: fixed;
@@ -103,6 +105,7 @@
     cursor: pointer;
     z-index: 1100;
   }
+
   /* Buttons */
   button {
     background: #e91e63;
@@ -118,6 +121,7 @@
   button:hover {
     background: #c2185b;
   }
+
   /* Form */
   textarea, input {
     width: 100%;
@@ -134,6 +138,7 @@
     width: 90%;
     margin-bottom: 2rem;
   }
+
   /* Lists */
   ul {
     list-style: none;
@@ -160,6 +165,7 @@
   li button:hover {
     background: #ad1457;
   }
+
   /* Kalp ve Yıldız Animasyonları */
   .heart, .star {
     position: fixed;
@@ -203,6 +209,7 @@
       opacity: 0;
     }
   }
+
   /* Dark Mode Toggle */
   #darkModeToggle {
     position: fixed;
@@ -226,6 +233,7 @@
     background: #c2185b;
     box-shadow: 0 0 20px #c2185b;
   }
+
   /* Responsive */
   @media (max-width: 600px) {
     h1 { font-size: 2.2rem; }
@@ -240,11 +248,6 @@
     }
   }
 </style>
-
-<!-- Firebase SDK'ları -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
-
 </head>
 <body>
 
@@ -333,19 +336,6 @@
 </audio>
 
 <script>
-  // Firebase yapılandırması ve başlatma
-  const firebaseConfig = {
-    apiKey: "AIzaSyCm_VlCI9ofNmJ-Utcnwjv9Mb8gn3EcPIM",
-    authDomain: "iremtol.firebaseapp.com",
-    projectId: "iremtol",
-    storageBucket: "iremtol.appspot.com",
-    messagingSenderId: "668760454801",
-    appId: "1:668760454801:web:4378790487244c32093130",
-    measurementId: "G-2LG0ZVYTM0"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const storage = firebase.storage();
-
   // Günaydın / günorta / akşam mesajı
   function getGreeting() {
     const hour = new Date().getHours();
@@ -365,7 +355,7 @@
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     return diffDays >= 0 ? diffDays : 0;
   }
-  document.getElementById('days-together').textContent = `Beraber ${calculateDaysTogether()} gündür mutluyuz.`;
+  document.getElementById('days-together').textContent = Beraber ${calculateDaysTogether()} gündür mutluyuz.;
 
   // Favori alıntılar
   const quotes = [
@@ -385,74 +375,79 @@
     const now = new Date();
     const options = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
     const timeStr = now.toLocaleTimeString('tr-TR', options);
-    document.getElementById('clock').textContent = `Şu an saat: ${timeStr}`;
+    document.getElementById('clock').textContent = Şu an saat: ${timeStr};
   }
   setInterval(updateClock, 1000);
   updateClock();
 
-  // Fotoğraf galerisi Firebase ile
+  // Fotoğraf galerisi localStorage yönetimi
   const gallery = document.getElementById('gallery');
   const photoInput = document.getElementById('photoInput');
 
-  // Yükleme butonu yok, input değiştiğinde otomatik yüklenecek
+  function loadPhotos() {
+    const photos = JSON.parse(localStorage.getItem('photos')) || [];
+    gallery.innerHTML = '';
+    photos.forEach((photo, idx) => {
+      const div = document.createElement('div');
+      div.className = 'gallery-item';
+
+      const img = document.createElement('img');
+      img.src = photo;
+      img.alt = Fotoğraf ${idx + 1};
+      img.title = "Büyütmek için tıkla";
+      img.style.cursor = 'pointer';
+      img.onclick = () => openModal(photo);
+
+      const delBtn = document.createElement('button');
+      delBtn.textContent = '×';
+      delBtn.title = "Fotoğrafı sil";
+      delBtn.onclick = () => {
+        if(confirm('Bu fotoğrafı silmek istediğine emin misin?')) {
+          deletePhoto(idx);
+        }
+      };
+
+      div.appendChild(img);
+      div.appendChild(delBtn);
+      gallery.appendChild(div);
+    });
+  }
+
+  function savePhotos(photos) {
+    localStorage.setItem('photos', JSON.stringify(photos));
+  }
+
+  function deletePhoto(index) {
+    const photos = JSON.parse(localStorage.getItem('photos')) || [];
+    photos.splice(index, 1);
+    savePhotos(photos);
+    loadPhotos();
+  }
+
   photoInput.addEventListener('change', e => {
     const files = e.target.files;
     if(files.length === 0) return;
 
+    const photos = JSON.parse(localStorage.getItem('photos')) || [];
+
+    // Okuma işlemini async yapalım
+    let loadedCount = 0;
     for(let file of files) {
       if(!file.type.startsWith('image/')) continue;
-      const storageRef = storage.ref('images/' + file.name);
-      storageRef.put(file).then(() => {
-        listFiles();
-      }).catch(err => alert("Yükleme hatası: " + err.message));
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        photos.push(event.target.result);
+        loadedCount++;
+        if(loadedCount === files.length) {
+          savePhotos(photos);
+          loadPhotos();
+        }
+      };
+      reader.readAsDataURL(file);
     }
     photoInput.value = ''; // Aynı dosyayı tekrar yüklemek için temizle
   });
-
-  function listFiles() {
-    gallery.innerHTML = 'Yükleniyor...';
-    const listRef = storage.ref('images/');
-    listRef.listAll().then(result => {
-      gallery.innerHTML = '';
-      if(result.items.length === 0) {
-        gallery.innerHTML = '<p>Henüz fotoğraf yok.</p>';
-        return;
-      }
-      result.items.forEach(itemRef => {
-        itemRef.getDownloadURL().then(url => {
-          const div = document.createElement('div');
-          div.className = 'gallery-item';
-
-          const img = document.createElement('img');
-          img.src = url;
-          img.alt = itemRef.name;
-          img.title = "Büyütmek için tıkla";
-          img.style.cursor = 'pointer';
-          img.onclick = () => openModal(url);
-
-          const delBtn = document.createElement('button');
-          delBtn.textContent = '×';
-          delBtn.title = "Fotoğrafı sil";
-          delBtn.onclick = () => {
-            if(confirm('Bu fotoğrafı silmek istediğine emin misin?')) {
-              itemRef.delete().then(() => {
-                alert('Fotoğraf silindi!');
-                listFiles();
-              }).catch(err => alert('Silme hatası: ' + err.message));
-            }
-          };
-
-          div.appendChild(img);
-          div.appendChild(delBtn);
-          gallery.appendChild(div);
-        });
-      });
-    }).catch(err => {
-      gallery.innerHTML = 'Fotoğraflar listelenirken hata oluştu.';
-      console.error(err);
-    });
-  }
-  listFiles();
 
   // Modal yönetimi
   const modal = document.getElementById('modal');
@@ -474,7 +469,7 @@
     }
   };
 
-  // (Diğer mevcut kodlar aynen burada devam ediyor...)
+  loadPhotos();
 
   // Önemli günler
   const importantDates = [
@@ -486,26 +481,238 @@
     const now = new Date();
     let thisYearDate = new Date(now.getFullYear(), date.getMonth(), date.getDate());
     if(thisYearDate < now) {
-      thisYearDate.setFullYear(thisYearDate.getFullYear() + 1);
+      thisYearDate = new Date(now.getFullYear()+1, date.getMonth(), date.getDate());
     }
-    const diffTime = thisYearDate - now;
-    return Math.ceil(diffTime / (1000*60*60*24));
+    return Math.floor((thisYearDate - now) / (1000*60*60*24));
   }
-  const importantDatesList = document.getElementById('importantDates');
-  importantDates.forEach(item => {
-    const li = document.createElement('li');
-    li.textContent = `${item.name} için ${daysUntil(item.date)} gün kaldı.`;
-    importantDatesList.appendChild(li);
-  });
+  function renderImportantDates() {
+    const ul = document.getElementById('importantDates');
+    ul.innerHTML = '';
+    importantDates.forEach(d => {
+      const li = document.createElement('li');
+      li.textContent = ${d.name} için ${daysUntil(d.date)} gün kaldı.;
+      ul.appendChild(li);
+    });
+  }
+  renderImportantDates();
 
-  // Gece/Gündüz modu toggle
-  const darkModeToggle = document.getElementById('darkModeToggle');
-  darkModeToggle.onclick = () => {
-    document.body.classList.toggle('dark');
-    darkModeToggle.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+  // Favori şarkılar ve kontrol
+  const songs = [
+    "https://cdn.pixabay.com/download/audio/2021/08/04/audio_23917f0e7f.mp3",
+    "https://cdn.pixabay.com/download/audio/2023/03/03/audio_66cf68b2ae.mp3"
+  ];
+  let currentSongIndex = 0;
+  const audioPlayer = document.getElementById('audioPlayer');
+  const audioSource = document.getElementById('audioSource');
+  const prevSongBtn = document.getElementById('prevSong');
+  const nextSongBtn = document.getElementById('nextSong');
+
+  function loadSong(idx) {
+    if(idx < 0) idx = songs.length - 1;
+    if(idx >= songs.length) idx = 0;
+    currentSongIndex = idx;
+    audioSource.src = songs[currentSongIndex];
+    audioPlayer.load();
+    audioPlayer.play();
+  }
+  prevSongBtn.onclick = () => loadSong(currentSongIndex - 1);
+  nextSongBtn.onclick = () => loadSong(currentSongIndex + 1);
+  loadSong(0);
+
+  // Aşk testi (basit örnek)
+  const quizData = [
+    {
+      question: "İrem ve Tolga'nın en sevdiği renk hangisi?",
+      answers: ["Pembe", "Mavi", "Kırmızı", "Sarı"],
+      correct: 0
+    },
+    {
+      question: "İrem ve Tolga ilk tanıştıklarında nerede buluştu?",
+      answers: ["Kafe", "Park", "Okul", "Sinema"],
+      correct: 2
+    },
+    {
+      question: "İrem'in en sevdiği mevsim hangisi?",
+      answers: ["Yaz", "Kış", "İlkbahar", "Sonbahar"],
+      correct: 1
+    }
+  ];
+  let quizIndex = 0;
+  let quizScore = 0;
+  const quizQuestion = document.getElementById('quizQuestion');
+  const quizAnswers = document.getElementById('quizAnswers');
+  const nextQuizBtn = document.getElementById('nextQuizBtn');
+  const quizResult = document.getElementById('quizResult');
+
+  function showQuizQuestion() {
+    if(quizIndex >= quizData.length) {
+      quizQuestion.style.display = 'none';
+      quizAnswers.style.display = 'none';
+      nextQuizBtn.style.display = 'none';
+      quizResult.style.display = 'block';
+      quizResult.textContent = Test tamamlandı! Doğru cevap sayısı: ${quizScore} / ${quizData.length};
+      return;
+    }
+    quizResult.style.display = 'none';
+    quizQuestion.style.display = 'block';
+    quizAnswers.style.display = 'block';
+    nextQuizBtn.style.display = 'none';
+
+    const current = quizData[quizIndex];
+    quizQuestion.textContent = current.question;
+    quizAnswers.innerHTML = '';
+
+    current.answers.forEach((a, i) => {
+      const btn = document.createElement('button');
+      btn.textContent = a;
+      btn.onclick = () => {
+        if(i === current.correct) {
+          quizScore++;
+          btn.style.backgroundColor = '#4caf50';
+        } else {
+          btn.style.backgroundColor = '#f44336';
+        }
+        // Disable all answer buttons
+        Array.from(quizAnswers.children).forEach(b => b.disabled = true);
+        nextQuizBtn.style.display = 'inline-block';
+      };
+      quizAnswers.appendChild(btn);
+    });
+  }
+  nextQuizBtn.onclick = () => {
+    quizIndex++;
+    showQuizQuestion();
   };
+  showQuizQuestion();
 
-  // (Burada diğer fonksiyonların da devamı olabilir...)
+  // Not defteri
+  const noteForm = document.getElementById('noteForm');
+  const noteInput = document.getElementById('noteInput');
+  const notesList = document.getElementById('notesList');
+
+  function loadNotes() {
+    const notes = JSON.parse(localStorage.getItem('notes')) || [];
+    notesList.innerHTML = '';
+    notes.forEach((note, idx) => {
+      const li = document.createElement('li');
+      li.textContent = note;
+      const delBtn = document.createElement('button');
+      delBtn.textContent = 'Sil';
+      delBtn.title = "Notu sil";
+      delBtn.onclick = () => {
+        if(confirm('Bu notu silmek istediğine emin misin?')) {
+          deleteNote(idx);
+        }
+      };
+      li.appendChild(delBtn);
+      notesList.appendChild(li);
+    });
+  }
+  function saveNotes(notes) {
+    localStorage.setItem('notes', JSON.stringify(notes));
+  }
+  function deleteNote(idx) {
+    const notes = JSON.parse(localStorage.getItem('notes')) || [];
+    notes.splice(idx, 1);
+    saveNotes(notes);
+    loadNotes();
+  }
+  noteForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const val = noteInput.value.trim();
+    if(!val) return;
+    const notes = JSON.parse(localStorage.getItem('notes')) || [];
+    notes.push(val);
+    saveNotes(notes);
+    loadNotes();
+    noteInput.value = '';
+  });
+  loadNotes();
+
+  // Hediye listesi
+  const giftForm = document.getElementById('giftForm');
+  const giftInput = document.getElementById('giftInput');
+  const giftList = document.getElementById('giftList');
+
+  function loadGifts() {
+    const gifts = JSON.parse(localStorage.getItem('gifts')) || [];
+    giftList.innerHTML = '';
+    gifts.forEach((gift, idx) => {
+      const li = document.createElement('li');
+      li.textContent = gift;
+      const delBtn = document.createElement('button');
+      delBtn.textContent = 'Sil';
+      delBtn.title = "Hediyeyi sil";
+      delBtn.onclick = () => {
+        if(confirm('Bu hediyeyi silmek istediğine emin misin?')) {
+          deleteGift(idx);
+        }
+      };
+      li.appendChild(delBtn);
+      giftList.appendChild(li);
+    });
+  }
+  function saveGifts(gifts) {
+    localStorage.setItem('gifts', JSON.stringify(gifts));
+  }
+  function deleteGift(idx) {
+    const gifts = JSON.parse(localStorage.getItem('gifts')) || [];
+    gifts.splice(idx, 1);
+    saveGifts(gifts);
+    loadGifts();
+  }
+  giftForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const val = giftInput.value.trim();
+    if(!val) return;
+    const gifts = JSON.parse(localStorage.getItem('gifts')) || [];
+    gifts.push(val);
+    saveGifts(gifts);
+    loadGifts();
+    giftInput.value = '';
+  });
+  loadGifts();
+
+  // Gece/Gündüz modu
+  const darkModeToggle = document.getElementById('darkModeToggle');
+  function updateDarkModeUI() {
+    if(localStorage.getItem('darkMode') === 'true') {
+      document.body.classList.add('dark');
+      darkModeToggle.textContent = '☀️';
+    } else {
+      document.body.classList.remove('dark');
+      darkModeToggle.textContent = '🌙';
+    }
+  }
+  darkModeToggle.onclick = () => {
+    const isDark = localStorage.getItem('darkMode') === 'true';
+    localStorage.setItem('darkMode', !isDark);
+    updateDarkModeUI();
+  }
+  updateDarkModeUI();
+
+  // Arka planda kalp ve yıldızlar oluştur
+  function createFloatingShapes() {
+    const count = 25;
+    for(let i=0; i<count; i++) {
+      const heart = document.createElement('div');
+      heart.className = 'heart';
+      heart.style.left = ${Math.random()*100}vw;
+      heart.style.animationDelay = ${Math.random()*4}s;
+      heart.style.animationDuration = ${3 + Math.random()*3}s;
+      heart.style.top = ${100 + Math.random()*50}px;
+      document.body.appendChild(heart);
+
+      const star = document.createElement('div');
+      star.className = 'star';
+      star.style.left = ${Math.random()*100}vw;
+      star.style.animationDelay = ${Math.random()*4}s;
+      star.style.animationDuration = ${3 + Math.random()*3}s;
+      star.style.top = ${100 + Math.random()*50}px;
+      document.body.appendChild(star);
+    }
+  }
+  createFloatingShapes();
 
 </script>
 

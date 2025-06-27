@@ -42,6 +42,12 @@
     padding-bottom: 1rem;
     margin-bottom: 2rem;
   }
+  /* Fotoğraf container */
+  .gallery div {
+    position: relative;
+    display: inline-block;
+    margin-right: 10px;
+  }
   .gallery img {
     width: 140px;
     border-radius: 15px;
@@ -49,9 +55,26 @@
     flex-shrink: 0;
     cursor: pointer;
     transition: transform 0.3s;
+    display: block;
   }
   .gallery img:hover {
     transform: scale(1.1);
+  }
+  /* Sil butonu */
+  .gallery button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: rgba(255, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 2px 6px;
+    font-size: 0.9rem;
+  }
+  .gallery button:hover {
+    background-color: rgba(255, 0, 0, 0.9);
   }
   /* Modal */
   #modal {
@@ -237,13 +260,10 @@
 </div>
 
 <!-- Fotoğraf yükleme formu -->
-<div>
-  <h3>Fotoğraf Ekle</h3>
-  <form id="photoForm">
-    <input type="file" id="photoInput" accept="image/*" required />
-    <button type="submit">Fotoğraf Yükle</button>
-  </form>
-</div>
+<form id="photoForm">
+  <input type="file" id="photoInput" accept="image/*" required />
+  <button type="submit">Fotoğraf Yükle</button>
+</form>
 
 <!-- Modal büyük foto -->
 <div id="modal">
@@ -368,12 +388,14 @@
   const modalImg = document.getElementById('modalImg');
   const closeModalBtn = document.getElementById('closeModal');
 
-  document.getElementById('gallery').addEventListener('click', e => {
-    if (e.target.tagName === 'IMG') {
-      modalImg.src = e.target.src;
+  // Varolan galeri resimlerine modal açma işlevi
+  document.querySelectorAll('.gallery img').forEach(img => {
+    img.addEventListener('click', () => {
+      modalImg.src = img.src;
       modal.style.display = 'flex';
-    }
+    });
   });
+
   closeModalBtn.onclick = () => {
     modal.style.display = 'none';
     modalImg.src = '';
@@ -462,174 +484,4 @@
 
   function loadQuiz() {
     quizResult.style.display = 'none';
-    nextQuizBtn.style.display = 'none';
-    quizQuestion.textContent = quiz[quizIndex].question;
-    quizAnswers.innerHTML = '';
-    quiz[quizIndex].answers.forEach((answer,i) => {
-      const btn = document.createElement('button');
-      btn.textContent = answer;
-      btn.onclick = () => {
-        if(i === quiz[quizIndex].correct) {
-          score++;
-          btn.style.backgroundColor = "#4caf50";
-        } else {
-          btn.style.backgroundColor = "#f44336";
-        }
-        Array.from(quizAnswers.children).forEach(b => b.disabled = true);
-        nextQuizBtn.style.display = 'inline-block';
-      };
-      quizAnswers.appendChild(btn);
-    });
-  }
-  nextQuizBtn.onclick = () => {
-    quizIndex++;
-    if(quizIndex < quiz.length) {
-      loadQuiz();
-    } else {
-      quizQuestion.textContent = "Test tamamlandı!";
-      quizAnswers.innerHTML = '';
-      quizResult.style.display = 'block';
-      quizResult.textContent = `Doğru cevap sayısı: ${score} / ${quiz.length}`;
-      nextQuizBtn.style.display = 'none';
-    }
-  };
-  loadQuiz();
-
-  // Not defteri
-  const noteForm = document.getElementById('noteForm');
-  const noteInput = document.getElementById('noteInput');
-  const notesList = document.getElementById('notesList');
-
-  function loadNotes() {
-    const notes = JSON.parse(localStorage.getItem('notes')) || [];
-    notesList.innerHTML = '';
-    notes.forEach((note, index) => {
-      const li = document.createElement('li');
-      li.textContent = note;
-      const delBtn = document.createElement('button');
-      delBtn.textContent = 'Sil';
-      delBtn.onclick = () => {
-        notes.splice(index,1);
-        localStorage.setItem('notes', JSON.stringify(notes));
-        loadNotes();
-      };
-      li.appendChild(delBtn);
-      notesList.appendChild(li);
-    });
-  }
-  noteForm.onsubmit = e => {
-    e.preventDefault();
-    const note = noteInput.value.trim();
-    if(!note) return;
-    const notes = JSON.parse(localStorage.getItem('notes')) || [];
-    notes.push(note);
-    localStorage.setItem('notes', JSON.stringify(notes));
-    noteInput.value = '';
-    loadNotes();
-  };
-  loadNotes();
-
-  // Hediye listesi
-  const giftForm = document.getElementById('giftForm');
-  const giftInput = document.getElementById('giftInput');
-  const giftList = document.getElementById('giftList');
-
-  function loadGifts() {
-    const gifts = JSON.parse(localStorage.getItem('gifts')) || [];
-    giftList.innerHTML = '';
-    gifts.forEach((gift, idx) => {
-      const li = document.createElement('li');
-      li.textContent = gift;
-      const delBtn = document.createElement('button');
-      delBtn.textContent = "Sil";
-      delBtn.onclick = () => {
-        gifts.splice(idx,1);
-        localStorage.setItem('gifts', JSON.stringify(gifts));
-        loadGifts();
-      };
-      li.appendChild(delBtn);
-      giftList.appendChild(li);
-    });
-  }
-  giftForm.onsubmit = e => {
-    e.preventDefault();
-    const gift = giftInput.value.trim();
-    if(!gift) return;
-    const gifts = JSON.parse(localStorage.getItem('gifts')) || [];
-    gifts.push(gift);
-    localStorage.setItem('gifts', JSON.stringify(gifts));
-    giftInput.value = '';
-    loadGifts();
-  };
-  loadGifts();
-
-  // Gece/gündüz modu
-  const darkModeToggle = document.getElementById('darkModeToggle');
-  function setDarkMode(dark) {
-    if(dark) {
-      document.body.classList.add('dark');
-      darkModeToggle.textContent = '☀️';
-      localStorage.setItem('darkMode', 'true');
-    } else {
-      document.body.classList.remove('dark');
-      darkModeToggle.textContent = '🌙';
-      localStorage.setItem('darkMode', 'false');
-    }
-  }
-  darkModeToggle.onclick = () => {
-    setDarkMode(!document.body.classList.contains('dark'));
-  };
-  // Başlangıçta kayıttan al
-  setDarkMode(localStorage.getItem('darkMode') === 'true');
-
-  // Fotoğraf yükleme ve galeriye ekleme
-
-  const photoForm = document.getElementById('photoForm');
-  const photoInput = document.getElementById('photoInput');
-  const gallery = document.getElementById('gallery');
-
-  // LocalStorage'dan fotoğrafları yükle
-  function loadStoredPhotos() {
-    const photos = JSON.parse(localStorage.getItem('photos')) || [];
-    photos.forEach(src => {
-      const img = document.createElement('img');
-      img.src = src;
-      img.alt = "Kullanıcı yüklemesi";
-      gallery.appendChild(img);
-    });
-  }
-
-  photoForm.addEventListener('submit', e => {
-    e.preventDefault();
-    const file = photoInput.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      const base64 = event.target.result;
-
-      // Mevcut fotoğrafları al
-      const photos = JSON.parse(localStorage.getItem('photos')) || [];
-
-      photos.push(base64);
-
-      // Kaydet
-      localStorage.setItem('photos', JSON.stringify(photos));
-
-      // Galeriye ekle
-      const img = document.createElement('img');
-      img.src = base64;
-      img.alt = "Kullanıcı yüklemesi";
-      gallery.appendChild(img);
-
-      photoForm.reset();
-    };
-    reader.readAsDataURL(file);
-  });
-
-  loadStoredPhotos();
-
-</script>
-
-</body>
-</html>
+    nextQuiz

@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>İrem & Tolga - Sevgi Sitesi</title>
 <style>
-  /* (Buraya yukarıdaki CSS kodun aynen gelecek, kısalttım burada) */
   @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
   body {
     margin:0; padding:0;
@@ -19,7 +18,24 @@
     transition: background 0.5s, color 0.5s;
     overflow-x: hidden;
   }
-  /* ... Diğer CSS kodları aynen burada ... */
+  body.dark {
+    background: #121212;
+    color: #f0b6c2;
+  }
+  header {
+    text-align: center;
+    margin-top: 1rem;
+  }
+  h1 {
+    font-size: 3rem;
+    margin: 0.3rem 0;
+  }
+  #greeting, #days-together, #quote, #clock {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Fotoğraf galerisi */
   .gallery {
     display: flex;
     gap: 15px;
@@ -28,7 +44,7 @@
     padding-bottom: 1rem;
     margin-bottom: 2rem;
   }
-  .gallery img, .gallery video {
+  .gallery img {
     width: 140px;
     border-radius: 15px;
     box-shadow: 0 8px 15px rgba(136, 14, 79, 0.3);
@@ -36,7 +52,7 @@
     cursor: pointer;
     transition: transform 0.3s;
   }
-  .gallery img:hover, .gallery video:hover {
+  .gallery img:hover {
     transform: scale(1.1);
   }
   .gallery-item {
@@ -60,13 +76,13 @@
     text-align: center;
     padding: 0;
     transition: background 0.3s;
-    z-index: 2;
   }
   .gallery-item button:hover {
     background: rgba(255,255,255,1);
   }
-  /* Modallar */
-  #modal, #videoModal {
+
+  /* Modal */
+  #modal {
     position: fixed;
     top:0; left:0; right:0; bottom:0;
     background: rgba(0,0,0,0.8);
@@ -75,12 +91,12 @@
     align-items: center;
     z-index: 1000;
   }
-  #modal img, #modalVideo {
+  #modal img {
     max-width: 90vw;
     max-height: 90vh;
     border-radius: 20px;
   }
-  #closeModal, #closeVideoModal {
+  #closeModal {
     position: absolute;
     top: 10px;
     right: 20px;
@@ -88,6 +104,186 @@
     color: white;
     cursor: pointer;
     z-index: 1100;
+  }
+
+  /* Video galerisi */
+  #videoGallery video {
+    width: 140px;
+    border-radius: 15px;
+    box-shadow: 0 8px 15px rgba(136, 14, 79, 0.3);
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: transform 0.3s;
+  }
+  #videoGallery video:hover {
+    transform: scale(1.1);
+  }
+
+  /* Modal büyük video */
+  #videoModal {
+    display: none;
+    position: fixed;
+    top:0; left:0; right:0; bottom:0;
+    background: rgba(0,0,0,0.8);
+    justify-content: center;
+    align-items: center;
+    z-index: 1100;
+  }
+  #modalVideo {
+    max-width: 90vw;
+    max-height: 90vh;
+    border-radius: 20px;
+  }
+  #closeVideoModal {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 2rem;
+    color: white;
+    cursor: pointer;
+    z-index: 1200;
+  }
+
+  /* Buttons */
+  button {
+    background: #e91e63;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    color: white;
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin: 0.5rem 0.3rem;
+    transition: background 0.3s ease;
+  }
+  button:hover {
+    background: #c2185b;
+  }
+
+  /* Form */
+  textarea, input {
+    width: 100%;
+    border-radius: 10px;
+    border: 1.5px solid #e91e63;
+    padding: 10px 15px;
+    font-family: inherit;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    box-sizing: border-box;
+  }
+  form {
+    max-width: 350px;
+    width: 90%;
+    margin-bottom: 2rem;
+  }
+
+  /* Lists */
+  ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  li {
+    background: #fce4ec;
+    padding: 8px 12px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  body.dark li {
+    background: #4b134f;
+  }
+  li button {
+    background: #880e4f;
+    padding: 4px 8px;
+    font-size: 0.9rem;
+    border-radius: 10px;
+  }
+  li button:hover {
+    background: #ad1457;
+  }
+
+  /* Kalp ve Yıldız Animasyonları */
+  .heart, .star {
+    position: fixed;
+    width: 20px; height: 20px;
+    animation: floatUp 4s linear infinite;
+    opacity: 0.8;
+    border-radius: 10px 10px 0 0;
+    z-index: 1;
+  }
+  .heart {
+    background-color: #e91e63;
+    transform: rotate(-45deg);
+  }
+  .heart::before, .heart::after {
+    content: "";
+    position: absolute;
+    width: 20px; height: 20px;
+    background-color: #e91e63;
+    border-radius: 50%;
+  }
+  .heart::before {
+    top: -10px; left: 0;
+  }
+  .heart::after {
+    left: 10px; top: 0;
+  }
+  .star {
+    background-color: gold;
+    clip-path: polygon(
+      50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 
+      50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%
+    );
+  }
+  @keyframes floatUp {
+    0% {
+      transform: translateY(0);
+      opacity: 0.8;
+    }
+    100% {
+      transform: translateY(-300px);
+      opacity: 0;
+    }
+  }
+
+  /* Dark Mode Toggle */
+  #darkModeToggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #e91e63;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    box-shadow: 0 0 10px #e91e63;
+    z-index: 1500;
+  }
+  #darkModeToggle:hover {
+    background: #c2185b;
+    box-shadow: 0 0 20px #c2185b;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    h1 { font-size: 2.2rem; }
+    #greeting, #days-together, #quote, #clock { font-size: 1rem; }
+    .gallery img, #videoGallery video { width: 100px; }
+    button {
+      padding: 0.7rem 1rem;
+      font-size: 1rem;
+    }
+    form {
+      max-width: 95vw;
+    }
   }
 </style>
 </head>
@@ -110,6 +306,12 @@
 <!-- Fotoğraf galerisi -->
 <div class="gallery" id="gallery"></div>
 
+<!-- Modal büyük foto -->
+<div id="modal">
+  <span id="closeModal">×</span>
+  <img id="modalImg" src="" alt="Büyük Foto" />
+</div>
+
 <!-- Video yükleme -->
 <div>
   <h3>Video Yükle</h3>
@@ -119,19 +321,72 @@
 <!-- Video galerisi -->
 <div class="gallery" id="videoGallery"></div>
 
-<!-- Modal büyük foto -->
-<div id="modal">
-  <span id="closeModal">×</span>
-  <img id="modalImg" src="" alt="Büyük Foto" />
-</div>
-
-<!-- Video Modal -->
+<!-- Modal büyük video -->
 <div id="videoModal">
   <span id="closeVideoModal">×</span>
   <video id="modalVideo" controls></video>
 </div>
 
-<!-- Burada diğer bölümler devam edebilir -->
+<!-- Önemli Günler -->
+<div>
+  <h3>Yaklaşan Önemli Günler</h3>
+  <ul id="importantDates"></ul>
+</div>
+
+<!-- Şarkı Listesi -->
+<div>
+  <h3>Favori Şarkılar</h3>
+  <audio id="audioPlayer" controls>
+    <source id="audioSource" src="" type="audio/mpeg">
+    Tarayıcınız ses öğesini desteklemiyor.
+  </audio>
+  <div>
+    <button id="prevSong">Önceki</button>
+    <button id="nextSong">Sonraki</button>
+  </div>
+</div>
+
+<!-- Aşk Testi -->
+<div>
+  <h3>Aşk Testi</h3>
+  <div id="quizContainer">
+    <p id="quizQuestion"></p>
+    <div id="quizAnswers"></div>
+    <button id="nextQuizBtn" style="display:none;">Sonraki Soru</button>
+  </div>
+  <div id="quizResult" style="display:none; margin-top:1rem; font-weight:bold;"></div>
+</div>
+
+<!-- Not Defteri -->
+<div>
+  <h3>Not Defteri</h3>
+  <form id="noteForm">
+    <textarea id="noteInput" rows="4" placeholder="Sevgiline not yaz..."></textarea>
+    <button type="submit">Notu Kaydet</button>
+  </form>
+  <div>
+    <h4>Kaydedilen Notlar</h4>
+    <ul id="notesList"></ul>
+  </div>
+</div>
+
+<!-- Hediye Listesi -->
+<div>
+  <h3>Hediye Listesi</h3>
+  <form id="giftForm">
+    <input type="text" id="giftInput" placeholder="Hediye ekle..." required />
+    <button type="submit">Ekle</button>
+  </form>
+  <ul id="giftList"></ul>
+</div>
+
+<!-- Gece/Gündüz Modu Butonu -->
+<div id="darkModeToggle" title="Gece/Gündüz Modu">🌙</div>
+
+<!-- Arka plan müziği (gizli) -->
+<audio autoplay loop id="backgroundMusic" style="display:none;">
+  <source src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_23917f0e7f.mp3" type="audio/mpeg" />
+</audio>
 
 <script>
   // --- Günaydın / günorta / akşam mesajı ---
@@ -144,10 +399,12 @@
   document.getElementById('greeting').textContent = getGreeting();
 
   // --- Beraber geçen gün sayısı ---
-  const startDate = new Date(2025, 5, 23); // 23 Haziran 2025
+  const startDate = new Date(2025, 5, 23); // 23 Haziran 2025 (ay 0'dan başlar)
   function calculateDaysTogether() {
     const today = new Date();
-    const diffTime = today.setHours(0,0,0,0) - startDate.setHours(0,0,0,0);
+    const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+    const now = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const diffTime = now - start;
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     return diffDays >= 0 ? diffDays : 0;
   }
@@ -170,7 +427,8 @@
   function updateClock() {
     const now = new Date();
     const options = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
-    document.getElementById('clock').textContent = `Şu an saat: ${now.toLocaleTimeString('tr-TR', options)}`;
+    const timeStr = now.toLocaleTimeString('tr-TR', options);
+    document.getElementById('clock').textContent = `Şu an saat: ${timeStr}`;
   }
   setInterval(updateClock, 1000);
   updateClock();
@@ -243,7 +501,7 @@
     photoInput.value = '';
   });
 
-  // Fotoğraf modal
+  // Modal yönetimi (Fotoğraf)
   const modal = document.getElementById('modal');
   const modalImg = document.getElementById('modalImg');
   const closeModalBtn = document.getElementById('closeModal');
@@ -265,7 +523,7 @@
 
   loadPhotos();
 
-  // --- VİDEO YÜKLEME VE GALERİ ---
+  // --- VIDEO YÜKLEME VE GALERİ ---
   const videoGallery = document.getElementById('videoGallery');
   const videoInput = document.getElementById('videoInput');
 
@@ -278,18 +536,18 @@
 
       const vid = document.createElement('video');
       vid.src = video;
+      vid.title = `Video ${idx + 1}`;
       vid.controls = false;
-      vid.width = 140;
-      vid.title = "Büyütmek için tıkla";
-      vid.style.cursor = 'pointer';
+      vid.muted = true; // küçük önizleme sessiz olsun
       vid.onclick = () => openVideoModal(video);
 
+      // Silme butonu
       const delBtn = document.createElement('button');
       delBtn.textContent = '×';
       delBtn.title = "Videoyu sil";
       delBtn.onclick = (e) => {
         e.stopPropagation();
-        if(confirm('Bu videoyu silmek istediğine emin misin?')) {
+        if (confirm('Bu videoyu silmek istediğine emin misin?')) {
           deleteVideo(idx);
         }
       };
@@ -313,7 +571,7 @@
 
   videoInput.addEventListener('change', e => {
     const files = Array.from(e.target.files).filter(f => f.type.startsWith('video/'));
-    if(files.length === 0) return;
+    if (files.length === 0) return;
 
     const videos = JSON.parse(localStorage.getItem('videos')) || [];
     let loadedCount = 0;
@@ -323,7 +581,7 @@
       reader.onload = (event) => {
         videos.push(event.target.result);
         loadedCount++;
-        if(loadedCount === files.length) {
+        if (loadedCount === files.length) {
           saveVideos(videos);
           loadVideos();
         }
@@ -334,7 +592,7 @@
     videoInput.value = '';
   });
 
-  // Video modal açma ve kapama
+  // Modal yönetimi (Video)
   const videoModal = document.getElementById('videoModal');
   const modalVideo = document.getElementById('modalVideo');
   const closeVideoModalBtn = document.getElementById('closeVideoModal');
@@ -352,7 +610,7 @@
   };
 
   videoModal.onclick = (e) => {
-    if(e.target === videoModal) {
+    if (e.target === videoModal) {
       videoModal.style.display = 'none';
       modalVideo.pause();
       modalVideo.src = '';
@@ -360,7 +618,216 @@
   };
 
   loadVideos();
-</script>
 
+  // --- Önemli Günler ---
+  const importantDates = [
+    { name: "İlk Buluşma", date: "2025-06-23" },
+    { name: "Nişanımız", date: "2025-12-10" },
+    { name: "Evlenme Yıldönümü", date: "2026-06-15" }
+  ];
+  const importantDatesList = document.getElementById('importantDates');
+  function updateImportantDates() {
+    importantDatesList.innerHTML = '';
+    const today = new Date();
+    importantDates.forEach(item => {
+      const date = new Date(item.date);
+      const diffTime = date - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      if (diffDays >= 0) {
+        const li = document.createElement('li');
+        li.textContent = `${item.name}: ${date.toLocaleDateString('tr-TR')} (${diffDays} gün kaldı)`;
+        importantDatesList.appendChild(li);
+      }
+    });
+  }
+  updateImportantDates();
+
+  // --- Favori Şarkılar ---
+  const songs = [
+    { name: "Sevda Çiçeği", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+    { name: "Gülümse", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
+    { name: "Kalbimde", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" }
+  ];
+  let currentSongIndex = 0;
+  const audioPlayer = document.getElementById('audioPlayer');
+  const audioSource = document.getElementById('audioSource');
+  const prevSongBtn = document.getElementById('prevSong');
+  const nextSongBtn = document.getElementById('nextSong');
+
+  function loadSong(index) {
+    currentSongIndex = index;
+    audioSource.src = songs[index].url;
+    audioPlayer.load();
+    audioPlayer.play();
+  }
+  prevSongBtn.onclick = () => {
+    currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
+    loadSong(currentSongIndex);
+  };
+  nextSongBtn.onclick = () => {
+    currentSongIndex = (currentSongIndex + 1) % songs.length;
+    loadSong(currentSongIndex);
+  };
+  loadSong(currentSongIndex);
+
+  // --- Aşk Testi ---
+  const quizData = [
+    {
+      question: "İrem'i ilk gördüğünde ne hissettin?",
+      answers: [
+        { text: "Kalbim hızla atmaya başladı", correct: true },
+        { text: "Sadece merak ettim", correct: false },
+        { text: "Hiç bir şey hissetmedim", correct: false }
+      ]
+    },
+    {
+      question: "Birlikte en çok nerede vakit geçirmek istersin?",
+      answers: [
+        { text: "Sessiz bir parkta", correct: true },
+        { text: "Alışveriş merkezinde", correct: false },
+        { text: "Evde televizyon izleyerek", correct: false }
+      ]
+    },
+    {
+      question: "İrem sana hediye aldığında ne yaparsın?",
+      answers: [
+        { text: "Çok mutlu olurum", correct: true },
+        { text: "Normal karşılarım", correct: false },
+        { text: "Önemsemeden bırakırım", correct: false }
+      ]
+    }
+  ];
+  const quizContainer = document.getElementById('quizContainer');
+  const quizQuestion = document.getElementById('quizQuestion');
+  const quizAnswers = document.getElementById('quizAnswers');
+  const nextQuizBtn = document.getElementById('nextQuizBtn');
+  const quizResult = document.getElementById('quizResult');
+
+  let currentQuizIndex = 0;
+  let score = 0;
+
+  function loadQuiz() {
+    quizResult.style.display = 'none';
+    nextQuizBtn.style.display = 'none';
+    quizAnswers.innerHTML = '';
+    const currentQuiz = quizData[currentQuizIndex];
+    quizQuestion.textContent = currentQuiz.question;
+    currentQuiz.answers.forEach(answer => {
+      const btn = document.createElement('button');
+      btn.textContent = answer.text;
+      btn.onclick = () => {
+        if (answer.correct) {
+          score++;
+        }
+        Array.from(quizAnswers.children).forEach(b => b.disabled = true);
+        nextQuizBtn.style.display = 'inline-block';
+      };
+      quizAnswers.appendChild(btn);
+    });
+  }
+  nextQuizBtn.onclick = () => {
+    currentQuizIndex++;
+    if (currentQuizIndex < quizData.length) {
+      loadQuiz();
+    } else {
+      quizContainer.style.display = 'none';
+      quizResult.style.display = 'block';
+      quizResult.textContent = `Test tamamlandı! Doğru cevap sayısı: ${score} / ${quizData.length}`;
+    }
+  };
+  loadQuiz();
+
+  // --- Not Defteri ---
+  const noteForm = document.getElementById('noteForm');
+  const noteInput = document.getElementById('noteInput');
+  const notesList = document.getElementById('notesList');
+
+  function loadNotes() {
+    const notes = JSON.parse(localStorage.getItem('notes')) || [];
+    notesList.innerHTML = '';
+    notes.forEach((note, idx) => {
+      const li = document.createElement('li');
+      li.textContent = note;
+      const delBtn = document.createElement('button');
+      delBtn.textContent = 'Sil';
+      delBtn.onclick = () => {
+        notes.splice(idx, 1);
+        localStorage.setItem('notes', JSON.stringify(notes));
+        loadNotes();
+      };
+      li.appendChild(delBtn);
+      notesList.appendChild(li);
+    });
+  }
+  noteForm.onsubmit = e => {
+    e.preventDefault();
+    if (noteInput.value.trim() === '') return;
+    const notes = JSON.parse(localStorage.getItem('notes')) || [];
+    notes.push(noteInput.value.trim());
+    localStorage.setItem('notes', JSON.stringify(notes));
+    noteInput.value = '';
+    loadNotes();
+  };
+  loadNotes();
+
+  // --- Hediye Listesi ---
+  const giftForm = document.getElementById('giftForm');
+  const giftInput = document.getElementById('giftInput');
+  const giftList = document.getElementById('giftList');
+
+  function loadGifts() {
+    const gifts = JSON.parse(localStorage.getItem('gifts')) || [];
+    giftList.innerHTML = '';
+    gifts.forEach((gift, idx) => {
+      const li = document.createElement('li');
+      li.textContent = gift;
+      const delBtn = document.createElement('button');
+      delBtn.textContent = 'Sil';
+      delBtn.onclick = () => {
+        gifts.splice(idx, 1);
+        localStorage.setItem('gifts', JSON.stringify(gifts));
+        loadGifts();
+      };
+      li.appendChild(delBtn);
+      giftList.appendChild(li);
+    });
+  }
+  giftForm.onsubmit = e => {
+    e.preventDefault();
+    if (giftInput.value.trim() === '') return;
+    const gifts = JSON.parse(localStorage.getItem('gifts')) || [];
+    gifts.push(giftInput.value.trim());
+    localStorage.setItem('gifts', JSON.stringify(gifts));
+    giftInput.value = '';
+    loadGifts();
+  };
+  loadGifts();
+
+  // --- Gece/Gündüz Modu ---
+  const darkModeToggle = document.getElementById('darkModeToggle');
+  darkModeToggle.onclick = () => {
+    document.body.classList.toggle('dark');
+    // İkon değiştir
+    darkModeToggle.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+  };
+
+  // --- Kalp ve Yıldız Animasyonları ---
+  function createFloatingShape(className, leftPercent) {
+    const el = document.createElement('div');
+    el.className = className;
+    el.style.left = leftPercent + '%';
+    el.style.bottom = '-30px';
+    el.style.animationDuration = (Math.random() * 3 + 4) + 's';
+    document.body.appendChild(el);
+    setTimeout(() => {
+      el.remove();
+    }, 7000);
+  }
+  setInterval(() => {
+    createFloatingShape('heart', Math.random() * 100);
+    createFloatingShape('star', Math.random() * 100);
+  }, 800);
+
+</script>
 </body>
 </html>

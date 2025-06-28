@@ -44,7 +44,7 @@
     padding-bottom: 1rem;
     margin-bottom: 2rem;
   }
-  .gallery img, .gallery video {
+  .gallery img {
     width: 140px;
     border-radius: 15px;
     box-shadow: 0 8px 15px rgba(136, 14, 79, 0.3);
@@ -52,7 +52,7 @@
     cursor: pointer;
     transition: transform 0.3s;
   }
-  .gallery img:hover, .gallery video:hover {
+  .gallery img:hover {
     transform: scale(1.1);
   }
   .gallery-item {
@@ -104,31 +104,6 @@
     color: white;
     cursor: pointer;
     z-index: 1100;
-  }
-
-  /* Modal büyük video */
-  #videoModal {
-    display: none;
-    position: fixed;
-    top:0; left:0; right:0; bottom:0;
-    background: rgba(0,0,0,0.8);
-    justify-content: center;
-    align-items: center;
-    z-index: 1100;
-  }
-  #modalVideo {
-    max-width: 90vw;
-    max-height: 90vh;
-    border-radius: 20px;
-  }
-  #closeVideoModal {
-    position: absolute;
-    top: 10px;
-    right: 20px;
-    font-size: 2rem;
-    color: white;
-    cursor: pointer;
-    z-index: 1200;
   }
 
   /* Buttons */
@@ -263,7 +238,7 @@
   @media (max-width: 600px) {
     h1 { font-size: 2.2rem; }
     #greeting, #days-together, #quote, #clock { font-size: 1rem; }
-    .gallery img, .gallery video { width: 100px; }
+    .gallery img { width: 100px; }
     button {
       padding: 0.7rem 1rem;
       font-size: 1rem;
@@ -271,35 +246,6 @@
     form {
       max-width: 95vw;
     }
-  }
-
-  /* Yeni bölümler */
-  #notesSection, #importantDates {
-    max-width: 400px;
-    width: 90%;
-    background: #fce4ec;
-    padding: 15px;
-    border-radius: 15px;
-    margin-bottom: 2rem;
-    color: #880e4f;
-  }
-  body.dark #notesSection, body.dark #importantDates {
-    background: #4b134f;
-    color: #f0b6c2;
-  }
-  #notesSection h2, #importantDates h2 {
-    margin-top: 0;
-    margin-bottom: 0.8rem;
-  }
-  #notesArea {
-    height: 150px;
-    resize: vertical;
-  }
-  #importantDates div {
-    margin-bottom: 0.8rem;
-  }
-  #importantDates span {
-    font-weight: bold;
   }
 </style>
 </head>
@@ -328,35 +274,66 @@
   <img id="modalImg" src="" alt="Büyük Foto" />
 </div>
 
-<!-- Video yükleme -->
-<div>
-  <h3>Video Yükle</h3>
-  <input type="file" id="videoInput" accept="video/*" multiple />
-</div>
-
-<!-- Video galerisi -->
-<div class="gallery" id="videoGallery"></div>
-
-<!-- Modal büyük video -->
-<div id="videoModal">
-  <span id="closeVideoModal">×</span>
-  <video id="modalVideo" controls></video>
-</div>
-
 <!-- Önemli Günler -->
-<section id="importantDates">
-  <h2>Önemli Günler</h2>
-  <div>Doğum Günü: <span id="birthdayDate">15.04</span> (<span id="birthdayCountdown"></span> gün kaldı)</div>
-  <div>Yıl Dönümü: <span id="anniversaryDate">23.06</span> (<span id="anniversaryCountdown"></span> gün kaldı)</div>
-</section>
+<div>
+  <h3>Yaklaşan Önemli Günler</h3>
+  <ul id="importantDates"></ul>
+</div>
+
+<!-- Şarkı Listesi -->
+<div>
+  <h3>Favori Şarkılar</h3>
+  <audio id="audioPlayer" controls>
+    <source id="audioSource" src="" type="audio/mpeg">
+    Tarayıcınız ses öğesini desteklemiyor.
+  </audio>
+  <div>
+    <button id="prevSong">Önceki</button>
+    <button id="nextSong">Sonraki</button>
+  </div>
+</div>
+
+<!-- Aşk Testi -->
+<div>
+  <h3>Aşk Testi</h3>
+  <div id="quizContainer">
+    <p id="quizQuestion"></p>
+    <div id="quizAnswers"></div>
+    <button id="nextQuizBtn" style="display:none;">Sonraki Soru</button>
+  </div>
+  <div id="quizResult" style="display:none; margin-top:1rem; font-weight:bold;"></div>
+</div>
 
 <!-- Not Defteri -->
-<section id="notesSection">
-  <h2>Not Defteri</h2>
-  <textarea id="notesArea" placeholder="Buraya notlarınızı yazabilirsiniz..."></textarea>
-  <button id="saveNotesBtn">Notları Kaydet</button>
-  <button id="clearNotesBtn">Notları Temizle</button>
-</section>
+<div>
+  <h3>Not Defteri</h3>
+  <form id="noteForm">
+    <textarea id="noteInput" rows="4" placeholder="Sevgiline not yaz..."></textarea>
+    <button type="submit">Notu Kaydet</button>
+  </form>
+  <div>
+    <h4>Kaydedilen Notlar</h4>
+    <ul id="notesList"></ul>
+  </div>
+</div>
+
+<!-- Hediye Listesi -->
+<div>
+  <h3>Hediye Listesi</h3>
+  <form id="giftForm">
+    <input type="text" id="giftInput" placeholder="Hediye ekle..." required />
+    <button type="submit">Ekle</button>
+  </form>
+  <ul id="giftList"></ul>
+</div>
+
+<!-- Gece/Gündüz Modu Butonu -->
+<div id="darkModeToggle" title="Gece/Gündüz Modu">🌙</div>
+
+<!-- Arka plan müziği (gizli) -->
+<audio autoplay loop id="backgroundMusic" style="display:none;">
+  <source src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_23917f0e7f.mp3" type="audio/mpeg" />
+</audio>
 
 <script>
   // --- Günaydın / günorta / akşam mesajı ---
@@ -369,7 +346,7 @@
   document.getElementById('greeting').textContent = getGreeting();
 
   // --- Beraber geçen gün sayısı ---
-  const startDate = new Date(2025, 5, 23); // 23 Haziran 2025 (0'dan başlar)
+  const startDate = new Date(2025, 5, 23); // 23 Haziran 2025 (ay 0'dan başlar)
   function calculateDaysTogether() {
     const today = new Date();
     const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
@@ -471,7 +448,7 @@
     photoInput.value = '';
   });
 
-  // Modal yönetimi (Fotoğraf)
+  // Modal yönetimi
   const modal = document.getElementById('modal');
   const modalImg = document.getElementById('modalImg');
   const closeModalBtn = document.getElementById('closeModal');
@@ -493,148 +470,244 @@
 
   loadPhotos();
 
-  // --- VIDEO YÜKLEME VE GALERİ ---
-  const videoGallery = document.getElementById('videoGallery');
-  const videoInput = document.getElementById('videoInput');
-  const videos = []; // geçici bellekte tutuyoruz
+  // --- ÖNEMLİ GÜNLER ---
+  const importantDates = [
+    { date: '2025-07-01', event: 'İlk Buluşma Yıldönümü' },
+    { date: '2025-08-20', event: 'Sevgililer Günü' },
+    { date: '2025-12-25', event: 'Yeni Yıl Kutlaması' }
+  ];
+  const todayStr = new Date().toISOString().split('T')[0];
+  function loadImportantDates() {
+    const ul = document.getElementById('importantDates');
+    ul.innerHTML = '';
+    importantDates.forEach(({date, event}) => {
+      const li = document.createElement('li');
+      li.textContent = `${date} - ${event}`;
+      if(date === todayStr) {
+        li.style.fontWeight = 'bold';
+        li.style.color = '#e91e63';
+      }
+      ul.appendChild(li);
+    });
+  }
+  loadImportantDates();
 
-  function renderVideos() {
-    videoGallery.innerHTML = '';
-    videos.forEach((videoUrl, idx) => {
-      const div = document.createElement('div');
-      div.className = 'gallery-item';
+  // --- ŞARKI ÇALAR ---
+  const songs = [
+    {title: "Aşk Şarkısı 1", url: "https://cdn.pixabay.com/download/audio/2021/09/06/audio_4208f5ea3a.mp3?filename=joy-155381.mp3"},
+    {title: "Aşk Şarkısı 2", url: "https://cdn.pixabay.com/download/audio/2021/10/06/audio_30e6248e39.mp3?filename=relaxing-acoustic-guitar-5681.mp3"},
+    {title: "Aşk Şarkısı 3", url: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_8a54a7ffac.mp3?filename=happy-acoustic-guitar-11270.mp3"}
+  ];
+  let currentSongIndex = 0;
+  const audioPlayer = document.getElementById('audioPlayer');
+  const audioSource = document.getElementById('audioSource');
 
-      const vid = document.createElement('video');
-      vid.src = videoUrl;
-      vid.controls = false;
-      vid.muted = true; // küçük önizleme sessiz
-      vid.preload = 'metadata';
-      vid.style.width = '140px';
-      vid.style.borderRadius = '15px';
-      vid.style.cursor = 'pointer';
-      vid.onclick = () => openVideoModal(videoUrl);
+  function loadSong(index) {
+    if(index < 0) index = songs.length - 1;
+    else if(index >= songs.length) index = 0;
+    currentSongIndex = index;
+    audioSource.src = songs[currentSongIndex].url;
+    audioPlayer.load();
+    audioPlayer.play();
+  }
+  document.getElementById('prevSong').onclick = () => {
+    loadSong(currentSongIndex - 1);
+  };
+  document.getElementById('nextSong').onclick = () => {
+    loadSong(currentSongIndex + 1);
+  };
+  loadSong(currentSongIndex);
 
-      const delBtn = document.createElement('button');
-      delBtn.textContent = '×';
-      delBtn.title = "Videoyu sil";
-      delBtn.onclick = (e) => {
-        e.stopPropagation();
-        videos.splice(idx, 1);
-        renderVideos();
+  // --- AŞK TESTİ ---
+  const quiz = [
+    {
+      question: "İlk buluşmanızda en çok ne yaptınız?",
+      answers: ["Sinema", "Yürüyüş", "Kahve içmek", "Birlikte yemek"],
+      correct: 3
+    },
+    {
+      question: "Onun en çok sevdiği renk nedir?",
+      answers: ["Kırmızı", "Mavi", "Pembe", "Siyah"],
+      correct: 2
+    },
+    {
+      question: "Sizin için en önemli özellik nedir?",
+      answers: ["Sadakat", "Komiklik", "Zeka", "Güven"],
+      correct: 0
+    }
+  ];
+  let currentQuizIndex = 0;
+  let score = 0;
+
+  const quizQuestion = document.getElementById('quizQuestion');
+  const quizAnswers = document.getElementById('quizAnswers');
+  const nextQuizBtn = document.getElementById('nextQuizBtn');
+  const quizResult = document.getElementById('quizResult');
+
+  function showQuizQuestion(index) {
+    if(index >= quiz.length) {
+      quizContainer.style.display = 'none';
+      quizResult.style.display = 'block';
+      quizResult.textContent = `Test tamamlandı! Doğru cevap sayısı: ${score} / ${quiz.length}`;
+      return;
+    }
+    quizQuestion.textContent = quiz[index].question;
+    quizAnswers.innerHTML = '';
+    quiz[index].answers.forEach((ans, i) => {
+      const btn = document.createElement('button');
+      btn.textContent = ans;
+      btn.onclick = () => {
+        if(i === quiz[index].correct) {
+          score++;
+          btn.style.backgroundColor = '#4caf50';
+        } else {
+          btn.style.backgroundColor = '#e91e63';
+        }
+        // Tüm cevap butonlarını devre dışı bırak
+        [...quizAnswers.children].forEach(b => b.disabled = true);
+        nextQuizBtn.style.display = 'inline-block';
       };
-
-      div.appendChild(vid);
-      div.appendChild(delBtn);
-      videoGallery.appendChild(div);
+      quizAnswers.appendChild(btn);
     });
+    nextQuizBtn.style.display = 'none';
   }
-
-  videoInput.addEventListener('change', e => {
-    const files = Array.from(e.target.files).filter(f => f.type.startsWith('video/'));
-    if(files.length === 0) return;
-
-    files.forEach(file => {
-      const url = URL.createObjectURL(file);
-      videos.push(url);
-    });
-    renderVideos();
-    videoInput.value = '';
-  });
-
-  // Modal yönetimi (Video)
-  const videoModal = document.getElementById('videoModal');
-  const modalVideo = document.getElementById('modalVideo');
-  const closeVideoModalBtn = document.getElementById('closeVideoModal');
-
-  function openVideoModal(src) {
-    videoModal.style.display = 'flex';
-    modalVideo.src = src;
-    modalVideo.play();
-  }
-
-  closeVideoModalBtn.onclick = () => {
-    videoModal.style.display = 'none';
-    modalVideo.pause();
-    modalVideo.src = '';
+  nextQuizBtn.onclick = () => {
+    currentQuizIndex++;
+    showQuizQuestion(currentQuizIndex);
   };
+  const quizContainer = document.getElementById('quizContainer');
+  showQuizQuestion(currentQuizIndex);
 
-  videoModal.onclick = (e) => {
-    if(e.target === videoModal) {
-      videoModal.style.display = 'none';
-      modalVideo.pause();
-      modalVideo.src = '';
-    }
-  };
-
-  // --- Önemli Günler: Doğum Günü ve Yıl Dönümü için kalan gün hesaplama ---
-  const birthday = { month: 4, day: 15 }; // 15 Nisan
-  const anniversary = { month: 6, day: 23 }; // 23 Haziran
-
-  function daysUntil(month, day) {
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    let targetDate = new Date(currentYear, month - 1, day);
-    if (targetDate < now) {
-      // Bu yıl geçtiyse, gelecek yıl için hesapla
-      targetDate = new Date(currentYear + 1, month - 1, day);
-    }
-    const diffTime = targetDate - now;
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  }
-
-  function updateImportantDates() {
-    document.getElementById('birthdayDate').textContent = `${birthday.day < 10 ? '0' : ''}${birthday.day}.${birthday.month < 10 ? '0' : ''}${birthday.month}`;
-    document.getElementById('birthdayCountdown').textContent = daysUntil(birthday.month, birthday.day);
-
-    document.getElementById('anniversaryDate').textContent = `${anniversary.day < 10 ? '0' : ''}${anniversary.day}.${anniversary.month < 10 ? '0' : ''}${anniversary.month}`;
-    document.getElementById('anniversaryCountdown').textContent = daysUntil(anniversary.month, anniversary.day);
-  }
-  updateImportantDates();
-
-  // --- Not Defteri ---
-  const notesArea = document.getElementById('notesArea');
-  const saveNotesBtn = document.getElementById('saveNotesBtn');
-  const clearNotesBtn = document.getElementById('clearNotesBtn');
+  // --- NOT DEFTERİ ---
+  const noteForm = document.getElementById('noteForm');
+  const noteInput = document.getElementById('noteInput');
+  const notesList = document.getElementById('notesList');
 
   function loadNotes() {
-    const savedNotes = localStorage.getItem('notes');
-    if(savedNotes) {
-      notesArea.value = savedNotes;
-    }
+    const notes = JSON.parse(localStorage.getItem('notes')) || [];
+    notesList.innerHTML = '';
+    notes.forEach((note, idx) => {
+      const li = document.createElement('li');
+      li.textContent = note;
+      const delBtn = document.createElement('button');
+      delBtn.textContent = 'Sil';
+      delBtn.title = "Notu sil";
+      delBtn.onclick = () => {
+        if(confirm('Bu notu silmek istediğine emin misin?')) {
+          deleteNote(idx);
+        }
+      };
+      li.appendChild(delBtn);
+      notesList.appendChild(li);
+    });
   }
+  function saveNotes(notes) {
+    localStorage.setItem('notes', JSON.stringify(notes));
+  }
+  function deleteNote(index) {
+    const notes = JSON.parse(localStorage.getItem('notes')) || [];
+    notes.splice(index, 1);
+    saveNotes(notes);
+    loadNotes();
+  }
+  noteForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const val = noteInput.value.trim();
+    if(!val) return;
+    const notes = JSON.parse(localStorage.getItem('notes')) || [];
+    notes.push(val);
+    saveNotes(notes);
+    loadNotes();
+    noteInput.value = '';
+  });
   loadNotes();
 
-  saveNotesBtn.onclick = () => {
-    localStorage.setItem('notes', notesArea.value);
-    alert('Notlarınız kaydedildi!');
-  };
+  // --- HEDİYE LİSTESİ ---
+  const giftForm = document.getElementById('giftForm');
+  const giftInput = document.getElementById('giftInput');
+  const giftList = document.getElementById('giftList');
 
-  clearNotesBtn.onclick = () => {
-    if(confirm('Notları temizlemek istediğinize emin misiniz?')) {
-      notesArea.value = '';
-      localStorage.removeItem('notes');
+  function loadGifts() {
+    const gifts = JSON.parse(localStorage.getItem('gifts')) || [];
+    giftList.innerHTML = '';
+    gifts.forEach((gift, idx) => {
+      const li = document.createElement('li');
+      li.textContent = gift;
+      const delBtn = document.createElement('button');
+      delBtn.textContent = 'Sil';
+      delBtn.title = "Hediyeyi sil";
+      delBtn.onclick = () => {
+        if(confirm('Bu hediyeyi silmek istediğine emin misin?')) {
+          deleteGift(idx);
+        }
+      };
+      li.appendChild(delBtn);
+      giftList.appendChild(li);
+    });
+  }
+  function saveGifts(gifts) {
+    localStorage.setItem('gifts', JSON.stringify(gifts));
+  }
+  function deleteGift(index) {
+    const gifts = JSON.parse(localStorage.getItem('gifts')) || [];
+    gifts.splice(index, 1);
+    saveGifts(gifts);
+    loadGifts();
+  }
+  giftForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const val = giftInput.value.trim();
+    if(!val) return;
+    const gifts = JSON.parse(localStorage.getItem('gifts')) || [];
+    gifts.push(val);
+    saveGifts(gifts);
+    loadGifts();
+    giftInput.value = '';
+  });
+  loadGifts();
+
+  // --- GECE/GÜNDÜZ MODU ---
+  const darkModeToggle = document.getElementById('darkModeToggle');
+  darkModeToggle.onclick = () => {
+    document.body.classList.toggle('dark');
+    if(document.body.classList.contains('dark')) {
+      darkModeToggle.textContent = '☀️';
+      localStorage.setItem('darkMode', 'true');
+    } else {
+      darkModeToggle.textContent = '🌙';
+      localStorage.setItem('darkMode', 'false');
     }
   };
-
-  // --- Dark Mode Toggle ---
-  const darkModeToggle = document.createElement('div');
-  darkModeToggle.id = 'darkModeToggle';
-  darkModeToggle.textContent = '🌙';
-  document.body.appendChild(darkModeToggle);
-
-  // Kayıtlı mod durumu
+  // Sayfa açılırken kayıtlı modu uygula
   if(localStorage.getItem('darkMode') === 'true') {
     document.body.classList.add('dark');
+    darkModeToggle.textContent = '☀️';
+  } else {
+    darkModeToggle.textContent = '🌙';
   }
 
-  function toggleDarkMode() {
-    document.body.classList.toggle('dark');
-    const isDark = document.body.classList.contains('dark');
-    localStorage.setItem('darkMode', isDark);
+  // --- ANİMASYONLU KALP VE YILDIZLAR ---
+  function createHeart() {
+    const heart = document.createElement('div');
+    heart.className = 'heart';
+    heart.style.left = Math.random() * window.innerWidth + 'px';
+    heart.style.animationDuration = (3 + Math.random() * 3) + 's';
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 4000);
   }
-
-  darkModeToggle.addEventListener('click', toggleDarkMode);
+  function createStar() {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = Math.random() * window.innerWidth + 'px';
+    star.style.animationDuration = (4 + Math.random() * 4) + 's';
+    document.body.appendChild(star);
+    setTimeout(() => star.remove(), 4000);
+  }
+  setInterval(createHeart, 500);
+  setInterval(createStar, 700);
 
 </script>
+  
+
 </body>
 </html>

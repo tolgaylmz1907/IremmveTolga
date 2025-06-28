@@ -327,9 +327,9 @@
   <video id="modalVideo" controls></video>
 </div>
 
-<!-- Özel Günler: Doğum Günü ve Yıl Dönümü -->
+<!-- Önemli Günler -->
 <div>
-  <h3>Özel Günler</h3>
+  <h3>Yaklaşan Önemli Günler</h3>
   <ul id="importantDates"></ul>
 </div>
 
@@ -523,23 +523,24 @@
 
   loadPhotos();
 
-  // --- VIDEO YÜKLEME VE GALERİ ---
+  // --- VIDEO YÜKLEME VE GALERİ (Geçici, localStorage yok) ---
   const videoGallery = document.getElementById('videoGallery');
   const videoInput = document.getElementById('videoInput');
 
+  let videos = []; // sadece geçici bellek
+
   function loadVideos() {
-    const videos = JSON.parse(localStorage.getItem('videos')) || [];
     videoGallery.innerHTML = '';
-    videos.forEach((video, idx) => {
+    videos.forEach((videoURL, idx) => {
       const div = document.createElement('div');
       div.className = 'gallery-item';
 
       const vid = document.createElement('video');
-      vid.src = video;
+      vid.src = videoURL;
       vid.title = `Video ${idx + 1}`;
       vid.controls = false;
-      vid.muted = true; // küçük önizleme sessiz olsun
-      vid.onclick = () => openVideoModal(video);
+      vid.muted = true;
+      vid.onclick = () => openVideoModal(videoURL);
 
       const delBtn = document.createElement('button');
       delBtn.textContent = '×';
@@ -547,7 +548,10 @@
       delBtn.onclick = (e) => {
         e.stopPropagation();
         if(confirm('Bu videoyu silmek istediğine emin misin?')) {
-          deleteVideo(idx);
+          // URL nesnesini serbest bırak
+          URL.revokeObjectURL(videos[idx]);
+          videos.splice(idx, 1);
+          loadVideos();
         }
       };
 
@@ -557,36 +561,15 @@
     });
   }
 
-  function saveVideos(videos) {
-    localStorage.setItem('videos', JSON.stringify(videos));
-  }
-
-  function deleteVideo(index) {
-    const videos = JSON.parse(localStorage.getItem('videos')) || [];
-    videos.splice(index, 1);
-    saveVideos(videos);
-    loadVideos();
-  }
-
   videoInput.addEventListener('change', e => {
     const files = Array.from(e.target.files).filter(f => f.type.startsWith('video/'));
     if(files.length === 0) return;
 
-    const videos = JSON.parse(localStorage.getItem('videos')) || [];
-    let loadedCount = 0;
-
     files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        videos.push(event.target.result);
-        loadedCount++;
-        if(loadedCount === files.length) {
-          saveVideos(videos);
-          loadVideos();
-        }
-      };
-      reader.readAsDataURL(file);
+      const videoURL = URL.createObjectURL(file);
+      videos.push(videoURL);
     });
+    loadVideos();
 
     videoInput.value = '';
   });
@@ -616,149 +599,133 @@
 
   loadVideos();
 
-  // --- ÖZEL GÜNLER: DOĞUM GÜNÜ VE YIL DÖNÜMÜ ---
-  const specialDates = [
-    { name: "İrem'in Doğum Günü", date: "2025-06-23" },
-    { name: "Tolga'nın Doğum Günü", date: "2025-12-10" },
-    { name: "Evlenme Yıldönümümüz", date: "2026-06-15" }
+  // --- ÖNEMLİ GÜNLER ---
+  const importantDates = [
+    { name: "İlk Tanışma", date: "2025-06-23" },
+    { name: "Nişan", date: "2025-09-15" },
+    { name: "Evlenme Yıldönümü", date: "2026-06-23" },
   ];
 
-  const importantDatesList = document.getElementById('importantDates');
+  const importantDatesContainer = document.getElementById('importantDates');
 
-  function updateSpecialDates() {
-    importantDatesList.innerHTML = '';
+  function loadImportantDates() {
+    importantDatesContainer.innerHTML = '';
     const today = new Date();
-    specialDates.forEach(item => {
-      const date = new Date(item.date);
-      let targetDate = new Date(today.getFullYear(), date.getMonth(), date.getDate());
-      if (targetDate < today) {
-        targetDate = new Date(today.getFullYear() + 1, date.getMonth(), date.getDate());
-      }
-      const diffTime = targetDate - today;
+    importantDates.forEach(event => {
+      const dateObj = new Date(event.date);
+      const diffTime = dateObj - today;
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       const li = document.createElement('li');
-      li.textContent = `${item.name}: ${targetDate.toLocaleDateString('tr-TR')} (${diffDays} gün kaldı)`;
-      importantDatesList.appendChild(li);
+      if(diffDays > 0) {
+        li.textContent = `${event.name} için ${diffDays} gün kaldı.`;
+      } else if (diffDays === 0) {
+        li.textContent = `${event.name} bugün!`;
+      } else {
+        li.textContent = `${event.name} geçti.`;
+      }
+      importantDatesContainer.appendChild(li);
     });
   }
-  updateSpecialDates();
+  loadImportantDates();
 
-  // --- Favori Şarkılar ---
+  // --- ŞARKI LİSTESİ ---
   const songs = [
-    {
-      title: "Aşkımız Sonsuz",
-      url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-    },
-    {
-      title: "Kalbim Seninle",
-      url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
-    },
-    {
-      title: "Seni Seviyorum",
-      url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
-    }
+    { title: "Sen Bana Aşksın", url: "https://cdn.pixabay.com/download/audio/2022/03/23/audio_c08e9e7b13.mp3" },
+    { title: "Hayat Güzeldir", url: "https://cdn.pixabay.com/download/audio/2022/01/12/audio_3e06264e07.mp3" },
+    { title: "Kalbim Seninle", url: "https://cdn.pixabay.com/download/audio/2021/12/23/audio_f373d33b69.mp3" },
   ];
-  let currentSongIndex = 0;
+  let currentSong = 0;
   const audioPlayer = document.getElementById('audioPlayer');
   const audioSource = document.getElementById('audioSource');
   const prevSongBtn = document.getElementById('prevSong');
   const nextSongBtn = document.getElementById('nextSong');
 
   function loadSong(index) {
-    if(index < 0) index = songs.length -1;
-    if(index >= songs.length) index = 0;
-    currentSongIndex = index;
-    audioSource.src = songs[currentSongIndex].url;
+    if(index < 0) index = songs.length - 1;
+    else if(index >= songs.length) index = 0;
+    currentSong = index;
+    audioSource.src = songs[currentSong].url;
     audioPlayer.load();
     audioPlayer.play();
   }
+
   prevSongBtn.onclick = () => {
-    loadSong(currentSongIndex -1);
-  }
+    loadSong(currentSong - 1);
+  };
   nextSongBtn.onclick = () => {
-    loadSong(currentSongIndex +1);
-  }
-  loadSong(currentSongIndex);
+    loadSong(currentSong + 1);
+  };
+  loadSong(currentSong);
 
   // --- AŞK TESTİ ---
-  const quiz = [
+  const quizQuestions = [
     {
-      question: "Birlikte en çok ne yapmayı seviyorsunuz?",
-      answers: [
-        { text: "Film izlemek", score: 1 },
-        { text: "Yemek yapmak", score: 2 },
-        { text: "Seyahat etmek", score: 3 },
-        { text: "Dans etmek", score: 4 }
-      ]
+      question: "İlk buluşmada nereye gitmek istersin?",
+      answers: ["Romantik bir akşam yemeği", "Sinema", "Piknik", "Evde film izlemek"],
+      correct: 0
     },
     {
-      question: "En unutulmaz anınız nedir?",
-      answers: [
-        { text: "İlk buluşma", score: 4 },
-        { text: "Tatilde yaşanan komik olay", score: 2 },
-        { text: "Sürpriz parti", score: 3 },
-        { text: "Günlük yürüyüşler", score: 1 }
-      ]
+      question: "Sevgilin seni ne zaman en çok mutlu eder?",
+      answers: ["Sürpriz hediyelerle", "Birlikte seyahat ederek", "Sadece yanında olarak", "Güzel sözlerle"],
+      correct: 3
     },
     {
-      question: "Birlikte gelecekte ne planlıyorsunuz?",
-      answers: [
-        { text: "Ev almak", score: 4 },
-        { text: "Dünyayı gezmek", score: 3 },
-        { text: "Aile kurmak", score: 4 },
-        { text: "Ortak iş kurmak", score: 2 }
-      ]
+      question: "Beraber en çok hangi aktiviteyi yapmayı seversiniz?",
+      answers: ["Dans etmek", "Yemek yapmak", "Spor yapmak", "Sohbet etmek"],
+      correct: 1
     }
   ];
 
   const quizQuestionEl = document.getElementById('quizQuestion');
   const quizAnswersEl = document.getElementById('quizAnswers');
   const nextQuizBtn = document.getElementById('nextQuizBtn');
-  const quizResult = document.getElementById('quizResult');
+  const quizResultEl = document.getElementById('quizResult');
 
-  let currentQuizIndex = 0;
-  let totalScore = 0;
+  let currentQuiz = 0;
+  let score = 0;
+  let answered = false;
 
-  function showQuizQuestion() {
-    const current = quiz[currentQuizIndex];
-    quizQuestionEl.textContent = current.question;
+  function loadQuiz() {
+    answered = false;
+    quizResultEl.style.display = 'none';
+    nextQuizBtn.style.display = 'none';
     quizAnswersEl.innerHTML = '';
-    current.answers.forEach((ans, idx) => {
+
+    const q = quizQuestions[currentQuiz];
+    quizQuestionEl.textContent = q.question;
+
+    q.answers.forEach((ans, idx) => {
       const btn = document.createElement('button');
-      btn.textContent = ans.text;
+      btn.textContent = ans;
       btn.onclick = () => {
-        totalScore += ans.score;
+        if(answered) return;
+        answered = true;
+        if(idx === q.correct) {
+          score++;
+          btn.style.backgroundColor = '#4caf50';
+        } else {
+          btn.style.backgroundColor = '#f44336';
+        }
         nextQuizBtn.style.display = 'inline-block';
-        Array.from(quizAnswersEl.children).forEach(b => b.disabled = true);
       };
       quizAnswersEl.appendChild(btn);
     });
-    nextQuizBtn.style.display = 'none';
-    quizResult.style.display = 'none';
   }
 
   nextQuizBtn.onclick = () => {
-    currentQuizIndex++;
-    if(currentQuizIndex >= quiz.length) {
-      showQuizResult();
+    currentQuiz++;
+    if(currentQuiz < quizQuestions.length) {
+      loadQuiz();
     } else {
-      showQuizQuestion();
+      quizQuestionEl.style.display = 'none';
+      quizAnswersEl.style.display = 'none';
+      nextQuizBtn.style.display = 'none';
+      quizResultEl.style.display = 'block';
+      quizResultEl.textContent = `Test tamamlandı! Doğru cevap sayısı: ${score} / ${quizQuestions.length}`;
     }
-  }
+  };
 
-  function showQuizResult() {
-    quizQuestionEl.textContent = "Test tamamlandı!";
-    quizAnswersEl.innerHTML = "";
-    nextQuizBtn.style.display = 'none';
-    let message = "";
-    if(totalScore >= 10) message = "Aşkınız çok güçlü ve özel!";
-    else if(totalScore >= 6) message = "Aşkınız güzel ve umut verici.";
-    else message = "Biraz daha birbirinizi tanımanız gerekebilir.";
-    quizResult.textContent = message;
-    quizResult.style.display = 'block';
-  }
-
-  showQuizQuestion();
+  loadQuiz();
 
   // --- NOT DEFTERİ ---
   const noteForm = document.getElementById('noteForm');
@@ -766,11 +733,12 @@
   const notesList = document.getElementById('notesList');
 
   function loadNotes() {
-    const notes = JSON.parse(localStorage.getItem('loveNotes')) || [];
+    const notes = JSON.parse(localStorage.getItem('notes')) || [];
     notesList.innerHTML = '';
     notes.forEach((note, idx) => {
       const li = document.createElement('li');
       li.textContent = note;
+
       const delBtn = document.createElement('button');
       delBtn.textContent = '×';
       delBtn.title = "Notu sil";
@@ -778,29 +746,30 @@
         if(confirm('Bu notu silmek istediğine emin misin?')) {
           deleteNote(idx);
         }
-      }
+      };
+
       li.appendChild(delBtn);
       notesList.appendChild(li);
     });
   }
 
   function saveNotes(notes) {
-    localStorage.setItem('loveNotes', JSON.stringify(notes));
+    localStorage.setItem('notes', JSON.stringify(notes));
   }
 
   function deleteNote(index) {
-    const notes = JSON.parse(localStorage.getItem('loveNotes')) || [];
-    notes.splice(index,1);
+    const notes = JSON.parse(localStorage.getItem('notes')) || [];
+    notes.splice(index, 1);
     saveNotes(notes);
     loadNotes();
   }
 
   noteForm.addEventListener('submit', e => {
     e.preventDefault();
-    const text = noteInput.value.trim();
-    if(text.length === 0) return;
-    const notes = JSON.parse(localStorage.getItem('loveNotes')) || [];
-    notes.push(text);
+    const val = noteInput.value.trim();
+    if(!val) return;
+    const notes = JSON.parse(localStorage.getItem('notes')) || [];
+    notes.push(val);
     saveNotes(notes);
     loadNotes();
     noteInput.value = '';
@@ -814,11 +783,12 @@
   const giftList = document.getElementById('giftList');
 
   function loadGifts() {
-    const gifts = JSON.parse(localStorage.getItem('giftList')) || [];
+    const gifts = JSON.parse(localStorage.getItem('gifts')) || [];
     giftList.innerHTML = '';
     gifts.forEach((gift, idx) => {
       const li = document.createElement('li');
       li.textContent = gift;
+
       const delBtn = document.createElement('button');
       delBtn.textContent = '×';
       delBtn.title = "Hediyeyi sil";
@@ -826,29 +796,30 @@
         if(confirm('Bu hediyeyi silmek istediğine emin misin?')) {
           deleteGift(idx);
         }
-      }
+      };
+
       li.appendChild(delBtn);
       giftList.appendChild(li);
     });
   }
 
   function saveGifts(gifts) {
-    localStorage.setItem('giftList', JSON.stringify(gifts));
+    localStorage.setItem('gifts', JSON.stringify(gifts));
   }
 
   function deleteGift(index) {
-    const gifts = JSON.parse(localStorage.getItem('giftList')) || [];
-    gifts.splice(index,1);
+    const gifts = JSON.parse(localStorage.getItem('gifts')) || [];
+    gifts.splice(index, 1);
     saveGifts(gifts);
     loadGifts();
   }
 
   giftForm.addEventListener('submit', e => {
     e.preventDefault();
-    const gift = giftInput.value.trim();
-    if(gift.length === 0) return;
-    const gifts = JSON.parse(localStorage.getItem('giftList')) || [];
-    gifts.push(gift);
+    const val = giftInput.value.trim();
+    if(!val) return;
+    const gifts = JSON.parse(localStorage.getItem('gifts')) || [];
+    gifts.push(val);
     saveGifts(gifts);
     loadGifts();
     giftInput.value = '';
@@ -862,44 +833,27 @@
     document.body.classList.toggle('dark');
     if(document.body.classList.contains('dark')) {
       darkModeToggle.textContent = '☀️';
-      localStorage.setItem('mode', 'dark');
     } else {
       darkModeToggle.textContent = '🌙';
-      localStorage.setItem('mode', 'light');
     }
-  }
+  };
 
-  // Sayfa açılırken kaydedilmiş mod bilgisi varsa uygula
-  if(localStorage.getItem('mode') === 'dark') {
-    document.body.classList.add('dark');
-    darkModeToggle.textContent = '☀️';
-  }
-
-  // --- ARKA PLANDA HAFİF KALP VE YILDIZLAR ---
-  function createHeart() {
-    const heart = document.createElement('div');
-    heart.className = 'heart';
-    heart.style.left = Math.random() * window.innerWidth + 'px';
-    heart.style.top = window.innerHeight + 20 + 'px';
-    heart.style.animationDuration = (3 + Math.random() * 3) + 's';
-    document.body.appendChild(heart);
+  // --- Kalp ve Yıldız Animasyonları ---
+  function createFloatingShape(className) {
+    const shape = document.createElement('div');
+    shape.className = className;
+    shape.style.left = Math.random() * window.innerWidth + 'px';
+    shape.style.top = window.innerHeight + 20 + 'px';
+    shape.style.animationDuration = (4 + Math.random() * 3) + 's';
+    shape.style.opacity = 0.8;
+    document.body.appendChild(shape);
     setTimeout(() => {
-      heart.remove();
-    }, 6000);
-  }
-  function createStar() {
-    const star = document.createElement('div');
-    star.className = 'star';
-    star.style.left = Math.random() * window.innerWidth + 'px';
-    star.style.top = window.innerHeight + 20 + 'px';
-    star.style.animationDuration = (4 + Math.random() * 4) + 's';
-    document.body.appendChild(star);
-    setTimeout(() => {
-      star.remove();
+      shape.remove();
     }, 7000);
   }
-  setInterval(createHeart, 700);
-  setInterval(createStar, 1200);
+
+  setInterval(() => createFloatingShape('heart'), 800);
+  setInterval(() => createFloatingShape('star'), 1200);
 
 </script>
 

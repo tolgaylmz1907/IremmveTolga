@@ -272,6 +272,35 @@
       max-width: 95vw;
     }
   }
+
+  /* Yeni bölümler */
+  #notesSection, #importantDates {
+    max-width: 400px;
+    width: 90%;
+    background: #fce4ec;
+    padding: 15px;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+    color: #880e4f;
+  }
+  body.dark #notesSection, body.dark #importantDates {
+    background: #4b134f;
+    color: #f0b6c2;
+  }
+  #notesSection h2, #importantDates h2 {
+    margin-top: 0;
+    margin-bottom: 0.8rem;
+  }
+  #notesArea {
+    height: 150px;
+    resize: vertical;
+  }
+  #importantDates div {
+    margin-bottom: 0.8rem;
+  }
+  #importantDates span {
+    font-weight: bold;
+  }
 </style>
 </head>
 <body>
@@ -313,6 +342,21 @@
   <span id="closeVideoModal">×</span>
   <video id="modalVideo" controls></video>
 </div>
+
+<!-- Önemli Günler -->
+<section id="importantDates">
+  <h2>Önemli Günler</h2>
+  <div>Doğum Günü: <span id="birthdayDate">15.04</span> (<span id="birthdayCountdown"></span> gün kaldı)</div>
+  <div>Yıl Dönümü: <span id="anniversaryDate">23.06</span> (<span id="anniversaryCountdown"></span> gün kaldı)</div>
+</section>
+
+<!-- Not Defteri -->
+<section id="notesSection">
+  <h2>Not Defteri</h2>
+  <textarea id="notesArea" placeholder="Buraya notlarınızı yazabilirsiniz..."></textarea>
+  <button id="saveNotesBtn">Notları Kaydet</button>
+  <button id="clearNotesBtn">Notları Temizle</button>
+</section>
 
 <script>
   // --- Günaydın / günorta / akşam mesajı ---
@@ -521,6 +565,75 @@
       modalVideo.src = '';
     }
   };
+
+  // --- Önemli Günler: Doğum Günü ve Yıl Dönümü için kalan gün hesaplama ---
+  const birthday = { month: 4, day: 15 }; // 15 Nisan
+  const anniversary = { month: 6, day: 23 }; // 23 Haziran
+
+  function daysUntil(month, day) {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    let targetDate = new Date(currentYear, month - 1, day);
+    if (targetDate < now) {
+      // Bu yıl geçtiyse, gelecek yıl için hesapla
+      targetDate = new Date(currentYear + 1, month - 1, day);
+    }
+    const diffTime = targetDate - now;
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  }
+
+  function updateImportantDates() {
+    document.getElementById('birthdayDate').textContent = `${birthday.day < 10 ? '0' : ''}${birthday.day}.${birthday.month < 10 ? '0' : ''}${birthday.month}`;
+    document.getElementById('birthdayCountdown').textContent = daysUntil(birthday.month, birthday.day);
+
+    document.getElementById('anniversaryDate').textContent = `${anniversary.day < 10 ? '0' : ''}${anniversary.day}.${anniversary.month < 10 ? '0' : ''}${anniversary.month}`;
+    document.getElementById('anniversaryCountdown').textContent = daysUntil(anniversary.month, anniversary.day);
+  }
+  updateImportantDates();
+
+  // --- Not Defteri ---
+  const notesArea = document.getElementById('notesArea');
+  const saveNotesBtn = document.getElementById('saveNotesBtn');
+  const clearNotesBtn = document.getElementById('clearNotesBtn');
+
+  function loadNotes() {
+    const savedNotes = localStorage.getItem('notes');
+    if(savedNotes) {
+      notesArea.value = savedNotes;
+    }
+  }
+  loadNotes();
+
+  saveNotesBtn.onclick = () => {
+    localStorage.setItem('notes', notesArea.value);
+    alert('Notlarınız kaydedildi!');
+  };
+
+  clearNotesBtn.onclick = () => {
+    if(confirm('Notları temizlemek istediğinize emin misiniz?')) {
+      notesArea.value = '';
+      localStorage.removeItem('notes');
+    }
+  };
+
+  // --- Dark Mode Toggle ---
+  const darkModeToggle = document.createElement('div');
+  darkModeToggle.id = 'darkModeToggle';
+  darkModeToggle.textContent = '🌙';
+  document.body.appendChild(darkModeToggle);
+
+  // Kayıtlı mod durumu
+  if(localStorage.getItem('darkMode') === 'true') {
+    document.body.classList.add('dark');
+  }
+
+  function toggleDarkMode() {
+    document.body.classList.toggle('dark');
+    const isDark = document.body.classList.contains('dark');
+    localStorage.setItem('darkMode', isDark);
+  }
+
+  darkModeToggle.addEventListener('click', toggleDarkMode);
 
 </script>
 </body>
